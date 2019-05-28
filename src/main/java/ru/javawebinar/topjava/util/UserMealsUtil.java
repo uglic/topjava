@@ -39,6 +39,10 @@ public class UserMealsUtil {
         result = getFilteredWithExceededStream3(mealList, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
         System.out.println("\nStream3 (final) version result:");
         result.forEach(System.out::println);
+
+        result = getFilteredWithExceededStream4(mealList, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
+        System.out.println("\nStream4 (FINAL) version result:");
+        result.forEach(System.out::println);
     }
 
     public static List<UserMealWithExceed> getFilteredWithExceeded(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
@@ -122,6 +126,32 @@ public class UserMealsUtil {
                                         .mapToInt(UserMeal::getCalories)
                                         .sum() > caloriesPerDay)
                         ))
+                .collect(Collectors.toList());
+    }
+
+    public static List<UserMealWithExceed> getFilteredWithExceededStream4(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
+        return mealList
+                .stream()
+                .collect(groupingBy(k -> k.getDateTime().toLocalDate(), toList()))
+                .values()
+                .stream()
+                .collect(
+                        groupingBy(
+                                k -> k.stream().mapToInt(UserMeal::getCalories).sum() > caloriesPerDay,
+                                mapping(m -> m.stream()
+                                                .filter(f ->
+                                                        TimeUtil.isBetween(
+                                                                f.getDateTime().toLocalTime(), startTime, endTime)),
+                                        collectingAndThen(toList(), p -> p.stream().flatMap(s -> s))))
+                )
+                .entrySet()
+                .stream()
+                .flatMap(m -> m.getValue()
+                        .map(p -> new UserMealWithExceed(
+                                p.getDateTime(),
+                                p.getDescription(),
+                                p.getCalories(),
+                                m.getKey())))
                 .collect(Collectors.toList());
     }
 }
