@@ -35,6 +35,10 @@ public class UserMealsUtil {
         result = getFilteredWithExceededStream2(mealList, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
         System.out.println("\nStream2 version result:");
         result.forEach(System.out::println);
+
+        result = getFilteredWithExceededStream3(mealList, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
+        System.out.println("\nStream3 (final) version result:");
+        result.forEach(System.out::println);
     }
 
     public static List<UserMealWithExceed> getFilteredWithExceeded(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
@@ -99,6 +103,25 @@ public class UserMealsUtil {
                                 v.getCalories(),
                                 m.getKey()
                         )))
+                .collect(Collectors.toList());
+    }
+
+    public static List<UserMealWithExceed> getFilteredWithExceededStream3(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
+        return mealList
+                .stream()
+                .collect(groupingBy(k -> k.getDateTime().toLocalDate(), toList()))
+                .values()
+                .stream()
+                .flatMap(p -> p.stream()
+                        .filter(f -> TimeUtil.isBetween(f.getDateTime().toLocalTime(), startTime, endTime))
+                        .map(v -> new UserMealWithExceed(
+                                v.getDateTime(),
+                                v.getDescription(),
+                                v.getCalories(),
+                                p.stream()
+                                        .mapToInt(UserMeal::getCalories)
+                                        .sum() > caloriesPerDay)
+                        ))
                 .collect(Collectors.toList());
     }
 }
