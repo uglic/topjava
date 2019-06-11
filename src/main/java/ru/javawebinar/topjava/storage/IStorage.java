@@ -1,4 +1,4 @@
-package ru.javawebinar.topjava.model;
+package ru.javawebinar.topjava.storage;
 
 import java.util.List;
 
@@ -11,9 +11,5 @@ public interface IStorage<T, K> {
 
     T get(K key);
 
-    long size();
-
     List<T> getAll();
-
-    void deleteAll();
 }

@@ -1,38 +1,31 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="ru.javawebinar.topjava.util.TimeUtil" %>
+<jsp:useBean id="action" type="java.lang.String" scope="request"/>
+<jsp:useBean id="returnUri" type="java.lang.String" scope="request"/>
 <c:if test="${not empty mealValue}">
-    <jsp:useBean id="mealValue" type="ru.javawebinar.topjava.model.MealTo" scope="request"/>
+    <jsp:useBean id="mealValue" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
 </c:if>
-<jsp:useBean id="dayNorm" type="java.lang.Integer" scope="request"/>
 <html>
 <head>
     <title>
-        ${(not empty mealValue)?'[Редактор] Запись от ':'[Новая] Запись о потреблении пищи'}
-        ${(not empty mealValue)?TimeUtil.formatTimeDate(mealValue.dateTime):''}
+        ${(not empty mealValue)?'[Редактор] Поступление от ':'[Новое] Поступление'}
+        ${(not empty mealValue)?TimeUtil.DATETIME_FORMATTER.format(mealValue.dateTime):''}
     </title>
     <link rel="stylesheet" type="text/css" href="css/style.css"/>
 </head>
 <body>
-<h3><a href="?">Список поступлений пиши</a></h3>
+<h3><a href="${returnUri}">Список</a></h3>
 <hr>
-<h2>${not empty mealValue?'[Редактор]':'[Новая запись]'} Поступление пиши</h2>
-<c:if test="${not empty mealValue}">
-    <h1>Исходное время: ${TimeUtil.formatTime(mealValue.time)}</h1>
-    <h2>Исходная дата: ${TimeUtil.formatDate(mealValue.date)}</h2>
-</c:if>
+<h2>${not empty mealValue?'[Редактор]':'[Новая запись]'} Поступление</h2>
 <hr/>
 <form action="?" method="post">
-    <input type="hidden" name="action" value="edit"/>
+    <input type="hidden" name="action" value="${action}"/>
     <input type="hidden" name="id" value="${mealValue.id}"/>
     <table>
         <tr>
-            <td style="width:20%">Дата:</td>
-            <td><input type="date" name="date" value="${mealValue.date}"/></td>
-        </tr>
-        <tr>
-            <td>Время:</td>
-            <td><input type="time" name="time" value="${mealValue.time}"/></td>
+            <td>Дата:</td>
+            <td><input type="datetime-local" name="dateTime" value="${mealValue.dateTime}"/></td>
         </tr>
         <tr>
             <td>Количество калорий:</td>
@@ -54,8 +47,8 @@
     </table>
 </form>
 <c:if test="${not empty mealValue}">
-    <a href="?action=view&id=${mealValue.id}">Посмотреть запись</a>
     <a href="?action=delete&id=${mealValue.id}">Удалить</a>
 </c:if>
+<a href="${returnUri}">К списку</a>
 </body>
 </html>

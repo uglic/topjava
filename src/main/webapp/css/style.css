@@ -1,7 +1,2 @@
-.excess  {background-color: mediumorchid}
-tr:hover.excess  {background-color: yellow}
-tr:hover {background-color: lightgray}
-img[class="boolean-true"]  {background: url("../img/true.png");  width: 32px; height: 32px;}
-img[class="boolean-false"] {background: url("../img/false.png"); width: 32px; height: 32px;}
-div[class="boolean-true"]  {background: url("../img/true.png");  width: 32px; height: 32px;}
-div[class="boolean-false"] {background: url("../img/false.png"); width: 32px; height: 32px;}
+.excess  {background-color: red}
+.notexcess {background-color: green}
