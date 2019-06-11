@@ -4,18 +4,26 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
- public class Meal {
+public class Meal extends AbstractEntity {
     private final LocalDateTime dateTime;
-
     private final String description;
-
     private final int calories;
 
     public Meal(LocalDateTime dateTime, String description, int calories) {
+        this(0, dateTime, description, calories);
+    }
+
+    public Meal(int id, LocalDateTime dateTime, String description, int calories) {
+        super(id);
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;
     }
+
+//    @Override
+//    public Meal cloneWithNewId(int newId){
+//        return new Meal(newId, dateTime, description, calories);
+//    }
 
     public LocalDateTime getDateTime() {
         return dateTime;
