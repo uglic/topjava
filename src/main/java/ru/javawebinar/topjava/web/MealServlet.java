@@ -21,6 +21,7 @@ public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
     private static final String EDIT = "mealEdit.jsp";
     private static final String LIST = "mealList.jsp";
+    private static final String SERVLET_SUBMAPPING = "meals";
     private static final int CALORIES_PER_DAY = 1300;
 
     private IStorage<Meal, Integer> storage;
@@ -50,7 +51,7 @@ public class MealServlet extends HttpServlet {
             case "delete":
                 storage.delete(Integer.parseInt(request.getParameter("id")));
                 log.debug("delete meal");
-                response.sendRedirect(request.getRequestURI());
+                response.sendRedirect(SERVLET_SUBMAPPING); // last part of request.getRequestURI()
                 return;
             default:
                 log.debug("redirect to meal list");
@@ -81,6 +82,6 @@ public class MealServlet extends HttpServlet {
                 log.debug("updated meal id = " + meal.getId());
             }
         }
-        response.sendRedirect(request.getRequestURI());
+        response.sendRedirect(SERVLET_SUBMAPPING); // last part of request.getRequestURI()
     }
 }
