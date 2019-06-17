@@ -26,9 +26,7 @@ public class ValidationUtil {
     }
 
     public static void checkNew(AbstractBaseEntity entity) {
-        if (!entity.isNew()) {
-            throw new IllegalArgumentException(entity + " must be new (id=null)");
-        }
+        checkNotFound(entity == null || entity.isNew(), entity + " must be new (id=null)");
     }
 
     public static void assureIdConsistent(AbstractBaseEntity entity, int id) {
@@ -36,7 +34,12 @@ public class ValidationUtil {
         if (entity.isNew()) {
             entity.setId(id);
         } else if (entity.getId() != id) {
-            throw new IllegalArgumentException(entity + " must be with id=" + id);
+            throw new NotFoundException(entity + " must be with id=" + id);
         }
+    }
+
+    public static <T extends AbstractBaseEntity> T checkNotNew(T entity) {
+        checkNotFound(entity != null && !entity.isNew(), entity + " must be not new");
+        return entity;
     }
 }
