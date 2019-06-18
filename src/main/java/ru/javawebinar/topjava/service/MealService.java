@@ -3,7 +3,7 @@ package ru.javawebinar.topjava.service;
 import ru.javawebinar.topjava.model.Meal;
 
 import java.time.LocalDate;
-import java.util.Collection;
+import java.util.List;
 
 public interface MealService {
     Meal create(int userId, Meal meal);
@@ -14,7 +14,7 @@ public interface MealService {
 
     void update(int userId, Meal meal);
 
-    Collection<Meal> getAll(int userId);
+    List<Meal> getAll(int userId);
 
-    Collection<Meal> getByDateBetween(int userId, LocalDate startDate, LocalDate endDate);
+    List<Meal> getByDateBetween(int userId, LocalDate startDate, LocalDate endDate);
 }

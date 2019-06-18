@@ -11,13 +11,12 @@ import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Collection;
 import java.util.List;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNotNew;
-import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
 import static ru.javawebinar.topjava.web.SecurityUtil.authUserCaloriesPerDay;
+import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
 
 @Controller
 public class MealRestController {
@@ -55,10 +54,10 @@ public class MealRestController {
         return service.get(authUserId(), meal.getId()).getId();
     }
 
-    public Collection<MealTo> getAll() {
+    public List<MealTo> getAll() {
         log.info("getAll");
         return MealsUtil.getFilteredWithExcess(
-                service.getByDateBetween(authUserId(), LocalDate.MIN, LocalDate.MAX),
+                service.getAll(authUserId()),
                 authUserCaloriesPerDay(),
                 LocalTime.MIN, LocalTime.MAX);
     }

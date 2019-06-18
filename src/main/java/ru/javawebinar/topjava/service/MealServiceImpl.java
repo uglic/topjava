@@ -6,7 +6,7 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 
 import java.time.LocalDate;
-import java.util.Collection;
+import java.util.List;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNotNew;
@@ -42,12 +42,12 @@ public class MealServiceImpl implements MealService {
     }
 
     @Override
-    public Collection<Meal> getAll(int userId) {
+    public List<Meal> getAll(int userId) {
         return repository.getAll(userId);
     }
 
     @Override
-    public Collection<Meal> getByDateBetween(int userId, LocalDate startDate, LocalDate endDate) {
+    public List<Meal> getByDateBetween(int userId, LocalDate startDate, LocalDate endDate) {
         return repository.getBetweenStartDateAndEndDate(userId, startDate, endDate);
     }
 }

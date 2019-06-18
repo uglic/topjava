@@ -26,7 +26,7 @@ public class SpringMain {
             System.out.println(mealController.get(1));
             //System.out.println("MUST ERROR: " + mealController.get(7));
             System.out.println(mealController.create(new Meal(LocalDateTime.now(), "Yes!", 2100)));
-            System.out.println(mealController.get(7));
+            System.out.println(mealController.get(13));
             //System.out.println("MUST ERROR: " + mealController.get(8));
             //mealController.delete(7); // used in final result
             //mealController.delete(8); // MUST ERROR
@@ -39,7 +39,7 @@ public class SpringMain {
                     LocalDate.now(),
                     LocalDate.now(),
                     LocalTime.of(LocalTime.now().getHour(), 0),
-                    LocalTime.of(LocalTime.now().getHour() + 1, 0)));
+                    LocalTime.of(LocalTime.now().getHour(), 59)));
         }
     }
 }

@@ -22,7 +22,8 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
     private AtomicInteger counter = new AtomicInteger(0);
 
     {
-        MealsUtil.MEALS.forEach(m -> save(m.getUserId(), m));
+        MealsUtil.MEALS1.forEach(m -> save(1, m));
+        MealsUtil.MEALS2.forEach(m -> save(2, m));
     }
 
     @Override
@@ -52,15 +53,12 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
     @Override
     public boolean delete(int userId, int id) {
         log.info("delete {}", id);
-        Meal meal = get(userId, id);
-        if (meal != null) {
-            Map<Integer, Meal> userMeals = repository.get(userId);
-            if (userMeals != null && userMeals.remove(id) != null) {
-                if (userMeals.size() == 0) {
-                    repository.remove(userId);
-                }
-                return true;
+        Map<Integer, Meal> userMeals = repository.get(userId);
+        if (userMeals != null && userMeals.remove(id) != null) {
+            if (userMeals.size() == 0) {
+                repository.remove(userId);
             }
+            return true;
         }
         return false;
     }
@@ -70,27 +68,24 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
         log.info("get {}", id);
         Map<Integer, Meal> userMeals = repository.get(userId);
         if (userMeals != null) {
-            Meal meal = userMeals.get(id);
-            if (meal != null && meal.getUserId() == userId) {
-                return meal;
-            }
+            return userMeals.get(id);
         }
         return null;
     }
 
     @Override
-    public Collection<Meal> getAll(final int userId) {
+    public List<Meal> getAll(final int userId) {
         log.info("getAll");
         return getByFilter(userId, f -> true);
     }
 
     @Override
-    public Collection<Meal> getBetweenStartDateAndEndDate(int userId, LocalDate startDate, LocalDate endDate) {
+    public List<Meal> getBetweenStartDateAndEndDate(int userId, LocalDate startDate, LocalDate endDate) {
         log.info("getByDateFilter");
         return getByFilter(userId, f -> DateTimeUtil.isBetween(f.getDate(), startDate, endDate));
     }
 
-    private Collection<Meal> getByFilter(int userId, Predicate<Meal> filter) {
+    private List<Meal> getByFilter(int userId, Predicate<Meal> filter) {
         Map<Integer, Meal> userMeals = repository.get(userId);
         if (userMeals != null) {
             return userMeals.values().stream()
