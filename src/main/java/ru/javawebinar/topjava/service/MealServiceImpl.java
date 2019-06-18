@@ -6,10 +6,10 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Collection;
 
-import static ru.javawebinar.topjava.util.ValidationUtil.*;
+import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
+import static ru.javawebinar.topjava.util.ValidationUtil.checkNotNew;
 
 @Service
 public class MealServiceImpl implements MealService {
@@ -23,7 +23,6 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public Meal create(int userId, Meal meal) {
-        checkNew(meal);
         return checkNotNew(repository.save(userId, meal));
     }
 
@@ -39,7 +38,6 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public void update(int userId, Meal meal) {
-        checkNotNew(meal);
         checkNotFoundWithId(repository.save(userId, meal), meal.getId());
     }
 
@@ -49,8 +47,7 @@ public class MealServiceImpl implements MealService {
     }
 
     @Override
-    public Collection<Meal> getByDateBetweenAndTimeBetween(int userId, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
-        return repository.getByDateBetweenAndTimeBetween(userId,
-                startDate, endDate, startTime, endTime);
+    public Collection<Meal> getByDateBetween(int userId, LocalDate startDate, LocalDate endDate) {
+        return repository.getBetweenStartDateAndEndDate(userId, startDate, endDate);
     }
 }

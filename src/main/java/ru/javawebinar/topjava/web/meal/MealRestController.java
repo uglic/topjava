@@ -6,16 +6,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
+import ru.javawebinar.topjava.to.MealTo;
+import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collection;
+import java.util.List;
 
+import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
+import static ru.javawebinar.topjava.util.ValidationUtil.checkNotNew;
 import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
+import static ru.javawebinar.topjava.web.SecurityUtil.authUserCaloriesPerDay;
 
 @Controller
 public class MealRestController {
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private MealService service;
 
@@ -26,6 +32,7 @@ public class MealRestController {
 
     public Meal create(Meal meal) {
         log.info("create {}", meal);
+        checkNew(meal);
         return service.create(authUserId(), meal);
     }
 
@@ -43,17 +50,24 @@ public class MealRestController {
 
     public void update(Meal meal) {
         log.info("update {} ", meal);
+        checkNotNew(meal);
         service.update(authUserId(), meal);
     }
 
-
-    public Collection<Meal> getAll() {
+    public Collection<MealTo> getAll() {
         log.info("getAll");
-        return service.getAll(authUserId());
+        return MealsUtil.getFilteredWithExcess(
+                service.getByDateBetween(authUserId(), LocalDate.MIN, LocalDate.MAX),
+                authUserCaloriesPerDay(),
+                LocalTime.MIN, LocalTime.MAX);
     }
 
-    public Collection<Meal> getByDateBetweenAndTimeBetween(int userId, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
-        log.info("getByDateBetweenAndTimeBetween");
-        return service.getByDateBetweenAndTimeBetween(userId, startDate, endDate, startTime, endTime);
+    public List<MealTo> getByDateBetweenAndTimeBetween(LocalDate startDate, LocalDate endDate,
+                                                       LocalTime startTime, LocalTime endTime) {
+        log.info("getByDateBetweenAndTimeBetweenWithCaloriesPerDay");
+        return MealsUtil.getFilteredWithExcess(
+                service.getByDateBetween(authUserId(), startDate, endDate),
+                authUserCaloriesPerDay(),
+                startTime, endTime);
     }
 }

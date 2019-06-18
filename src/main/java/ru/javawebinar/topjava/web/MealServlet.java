@@ -6,6 +6,7 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.repository.inmemory.InMemoryMealRepositoryImpl;
 import ru.javawebinar.topjava.util.MealsUtil;
+
 import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
 import static ru.javawebinar.topjava.web.SecurityUtil.authUserCaloriesPerDay;
 
@@ -38,8 +39,7 @@ public class MealServlet extends HttpServlet {
         Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
                 LocalDateTime.parse(request.getParameter("dateTime")),
                 request.getParameter("description"),
-                Integer.parseInt(request.getParameter("calories")),
-                SecurityUtil.authUserId());
+                Integer.parseInt(request.getParameter("calories")));
 
         log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
         repository.save(authUserId(), meal);
@@ -62,7 +62,7 @@ public class MealServlet extends HttpServlet {
             case "update":
                 final Meal meal = "create".equals(action) ?
                         new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "",
-                                1000, SecurityUtil.authUserId())
+                                1000)
                         : repository.get(authUserId, getId(request));
                 request.setAttribute("meal", meal);
                 request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
