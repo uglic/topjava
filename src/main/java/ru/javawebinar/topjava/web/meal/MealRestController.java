@@ -50,16 +50,14 @@ public class MealRestController {
     public int update(Meal meal) {
         log.info("update {} ", meal);
         checkNotNew(meal);
-        service.update(authUserId(), meal);
-        return service.get(authUserId(), meal.getId()).getId();
+        return service.update(authUserId(), meal);
     }
 
     public List<MealTo> getAll() {
         log.info("getAll");
-        return MealsUtil.getFilteredWithExcess(
+        return MealsUtil.getWithExcess(
                 service.getAll(authUserId()),
-                authUserCaloriesPerDay(),
-                LocalTime.MIN, LocalTime.MAX);
+                authUserCaloriesPerDay());
     }
 
     public List<MealTo> getByDateBetweenAndTimeBetween(LocalDate startDate, LocalDate endDate,

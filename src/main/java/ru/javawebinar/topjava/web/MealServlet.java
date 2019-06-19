@@ -74,10 +74,10 @@ public class MealServlet extends HttpServlet {
             default:
                 request.setAttribute("meals",
                         mealController.getByDateBetweenAndTimeBetween(
-                                getValueAndSetAttribute("startDate", LocalDate::parse, request),
-                                getValueAndSetAttribute("endDate", LocalDate::parse, request),
-                                getValueAndSetAttribute("startTime", LocalTime::parse, request),
-                                getValueAndSetAttribute("endTime", LocalTime::parse, request)));
+                                getValue("startDate", LocalDate::parse, request),
+                                getValue("endDate", LocalDate::parse, request),
+                                getValue("startTime", LocalTime::parse, request),
+                                getValue("endTime", LocalTime::parse, request)));
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
         }
@@ -88,7 +88,7 @@ public class MealServlet extends HttpServlet {
         return Integer.parseInt(paramId);
     }
 
-    private <T> T getValueAndSetAttribute(String parameterName, Function<String, T> parser, HttpServletRequest request) {
+    private <T> T getValue(String parameterName, Function<String, T> parser, HttpServletRequest request) {
         String value = request.getParameter(parameterName);
         if (value != null) {
             T parsedValue = null;
@@ -96,7 +96,6 @@ public class MealServlet extends HttpServlet {
                 parsedValue = parser.apply(value);
             } catch (RuntimeException e) {
             }
-            request.setAttribute(parameterName, parsedValue);
             return parsedValue;
         }
         return null;

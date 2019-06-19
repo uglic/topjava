@@ -12,7 +12,7 @@ public interface MealService {
 
     Meal get(int userId, int id);
 
-    void update(int userId, Meal meal);
+    int update(int userId, Meal meal);
 
     List<Meal> getAll(int userId);
 
