@@ -3,12 +3,14 @@ package ru.javawebinar.topjava.util;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.sql.Timestamp;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 
 public class DateTimeUtil {
+    // to store dateTime as timestampZ we must know at which TimeZone LocalDateTime objects are.
+    public static final ZoneId DEFAULT_TIMEZONE = ZoneId.systemDefault();
+
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     // DataBase doesn't support LocalDate.MIN/MAX
@@ -37,5 +39,26 @@ public class DateTimeUtil {
 
     public static LocalTime parseLocalTime(@Nullable String str) {
         return StringUtils.isEmpty(str) ? null : LocalTime.parse(str);
+    }
+
+    public static java.sql.Timestamp adjustStartDateTimeToSqlTimestamp(LocalDateTime dateTime) {
+        return java.sql.Timestamp.valueOf(dateTime != null ? dateTime : LocalDateTime.of(MIN_DATE, LocalTime.MIN));
+    }
+
+    public static java.sql.Timestamp adjustEndDateTimeToSqlTimestamp(LocalDateTime dateTime) {
+        return java.sql.Timestamp.valueOf(dateTime != null ? dateTime : LocalDateTime.of(MAX_DATE, LocalTime.MAX));
+    }
+
+    public static java.sql.Timestamp getTimestampForZone(LocalDateTime localDateTime, ZoneId zoneIdOfDateTime) {
+        return java.sql.Timestamp.from(ZonedDateTime.of(localDateTime, zoneIdOfDateTime).toInstant());
+    }
+
+    public static LocalDateTime getLocalDateTimeFromTimestamp(Timestamp dateTimeTimestamp, ZoneId visibleZoneId) {
+        return LocalDateTime.ofInstant(dateTimeTimestamp.toInstant(), visibleZoneId);
+    }
+
+    public static LocalDateTime adjustTimeZone(LocalDateTime dateTime, ZoneId fromTz, ZoneId toTz) {
+        if (dateTime == null) return null;
+        return ZonedDateTime.of(dateTime, fromTz).withZoneSameInstant(toTz).toLocalDateTime();
     }
 }

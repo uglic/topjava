@@ -26,4 +26,9 @@
         <appender-ref ref="file"/>
         <appender-ref ref="console"/>
     </root>
+
+    <logger name="org.springframework.jdbc.core.JdbcTemplate" level="INFO">
+        <Appender-Ref ref="console" />
+    </logger>
+
 </configuration>
