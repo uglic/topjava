@@ -38,23 +38,18 @@ public class JdbcMealRepository implements MealRepository {
 
     @Override
     public Meal save(Meal meal, int userId) {
-        // meal.dateTime must always be the local time in DEFAULT_TIMEZONE,
-        // so storing date as timestampZ preserves instant (localtime + tz, approx.)
-        Timestamp dateTimeTimestampZ = getTimestampForZone(meal.getDateTime(), DEFAULT_TIMEZONE);
-        MapSqlParameterSource fieldMap = new MapSqlParameterSource()
+        MapSqlParameterSource map = new MapSqlParameterSource()
                 .addValue("id", meal.getId())
-                .addValue("date_time", dateTimeTimestampZ)
+                .addValue("date_time", Timestamp.valueOf(meal.getDateTime()))
                 .addValue("description", meal.getDescription())
                 .addValue("calories", meal.getCalories())
                 .addValue("user_id", userId);
         if (meal.isNew()) {
-            Number newKey = insertTool.executeAndReturnKey(fieldMap);
+            Number newKey = insertTool.executeAndReturnKey(map);
             meal.setId(newKey.intValue());
-        } else {
-            String query = "UPDATE meals SET date_time=:date_time, description=:description, calories=:calories, user_id=:user_id WHERE id=:id AND user_id=:user_id";
-            if (namedParameterJdbcTemplate.update(query, fieldMap) == 0) {
-                return null;
-            }
+        } else if (namedParameterJdbcTemplate.update(
+                "UPDATE meals SET date_time=:date_time, description=:description, calories=:calories WHERE id=:id AND user_id=:user_id", map) == 0) {
+            return null;
         }
         return meal;
     }
@@ -66,21 +61,18 @@ public class JdbcMealRepository implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        // meal.dateTime will always be the local time in DEFAULT_TIMEZONE
         return DataAccessUtils.singleResult(
                 jdbcTemplate.query("SELECT * FROM meals WHERE id=? AND user_id=?", ROW_MAPPER, id, userId));
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        // meal.dateTime will always be the local time in DEFAULT_TIMEZONE
-        return jdbcTemplate.query("SELECT * FROM meals WHERE user_id=? ORDER BY date_time DESC, id DESC", ROW_MAPPER, userId);
+        return jdbcTemplate.query("SELECT * FROM meals WHERE user_id=? ORDER BY date_time DESC", ROW_MAPPER, userId);
     }
 
     @Override
     public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
-        // meal.dateTime will always be the local time in DEFAULT_TIMEZONE
-        return jdbcTemplate.query("SELECT * FROM meals WHERE (user_id=?) AND (date_time between ? and ?) ORDER BY date_time DESC, id DESC",
+        return jdbcTemplate.query("SELECT * FROM meals WHERE (user_id=?) AND (date_time between ? and ?) ORDER BY date_time DESC",
                 ROW_MAPPER, userId,
                 adjustStartDateTimeToSqlTimestamp(startDate),
                 adjustEndDateTimeToSqlTimestamp(endDate));

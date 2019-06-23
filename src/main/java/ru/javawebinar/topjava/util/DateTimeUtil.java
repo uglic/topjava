@@ -52,13 +52,4 @@ public class DateTimeUtil {
     public static java.sql.Timestamp getTimestampForZone(LocalDateTime localDateTime, ZoneId zoneIdOfDateTime) {
         return java.sql.Timestamp.from(ZonedDateTime.of(localDateTime, zoneIdOfDateTime).toInstant());
     }
-
-    public static LocalDateTime getLocalDateTimeFromTimestamp(Timestamp dateTimeTimestamp, ZoneId visibleZoneId) {
-        return LocalDateTime.ofInstant(dateTimeTimestamp.toInstant(), visibleZoneId);
-    }
-
-    public static LocalDateTime adjustTimeZone(LocalDateTime dateTime, ZoneId fromTz, ZoneId toTz) {
-        if (dateTime == null) return null;
-        return ZonedDateTime.of(dateTime, fromTz).withZoneSameInstant(toTz).toLocalDateTime();
-    }
 }
