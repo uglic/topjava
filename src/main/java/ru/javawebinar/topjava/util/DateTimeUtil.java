@@ -8,9 +8,6 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 
 public class DateTimeUtil {
-    // to store dateTime as timestampZ we must know at which TimeZone LocalDateTime objects are.
-    public static final ZoneId DEFAULT_TIMEZONE = ZoneId.systemDefault();
-
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     // DataBase doesn't support LocalDate.MIN/MAX
