@@ -45,8 +45,4 @@ public class DateTimeUtil {
     public static java.sql.Timestamp adjustEndDateTimeToSqlTimestamp(LocalDateTime dateTime) {
         return java.sql.Timestamp.valueOf(dateTime != null ? dateTime : LocalDateTime.of(MAX_DATE, LocalTime.MAX));
     }
-
-    public static java.sql.Timestamp getTimestampForZone(LocalDateTime localDateTime, ZoneId zoneIdOfDateTime) {
-        return java.sql.Timestamp.from(ZonedDateTime.of(localDateTime, zoneIdOfDateTime).toInstant());
-    }
 }
