@@ -3,7 +3,6 @@ package ru.javawebinar.topjava.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.TransactionSystemException;
 import org.springframework.util.Assert;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
@@ -14,7 +13,7 @@ import java.util.List;
 
 import static ru.javawebinar.topjava.util.DateTimeUtil.adjustEndDateTime;
 import static ru.javawebinar.topjava.util.DateTimeUtil.adjustStartDateTime;
-import static ru.javawebinar.topjava.util.ValidationUtil.*;
+import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
 
 @Service
 public class MealService {
@@ -50,20 +49,11 @@ public class MealService {
 
     public void update(Meal meal, int userId) {
         Assert.notNull(meal, "meal must not be null");
-        try {
-            Meal mealUpdated = repository.save(meal, userId);
-            checkNotFoundWithId(mealUpdated, meal.getId());
-        } catch (TransactionSystemException tse) {
-            throwUpdateError(meal, tse);
-        }
+        checkNotFoundWithId(repository.save(meal, userId), meal.getId());
     }
 
     public Meal create(Meal meal, int userId) {
         Assert.notNull(meal, "meal must not be null");
-        try {
-            return repository.save(meal, userId);
-        } catch (TransactionSystemException tse) {
-            return throwUpdateError(meal, tse);
-        }
+        return repository.save(meal, userId);
     }
 }

@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.repository.jpa;
 
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
@@ -21,20 +22,17 @@ public class JpaMealRepository implements MealRepository {
     @Override
     @Transactional
     public Meal save(Meal meal, int userId) {
-        User user;
-        if (null != (user = em.getReference(User.class, userId))) {
-            meal.setUser(user);
-            if (meal.isNew()) {
-                em.persist(meal);
-                return meal;
-            } else {
-                Meal persistedMeal = em.find(Meal.class, meal.getId());
-                if (persistedMeal != null) {
-                    user = persistedMeal.getUser();
-                    if (user != null && user.getId() == userId) {
-                        return em.merge(meal);
-                    }
-                }
+        if (meal.isNew()) {
+            meal.setUser(em.getReference(User.class, userId));
+            em.persist(meal);
+            return meal;
+        } else {
+            Meal persistedMeal = get(meal.getId(), userId);
+            if (persistedMeal != null) {
+                persistedMeal.setDateTime(meal.getDateTime());
+                persistedMeal.setDescription(meal.getDescription());
+                persistedMeal.setCalories(meal.getCalories());
+                return em.merge(persistedMeal);
             }
         }
         return null;
@@ -51,13 +49,11 @@ public class JpaMealRepository implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        Object[] meals = em.createNamedQuery(Meal.GET, Meal.class)
+        List<Meal> meals = em.createNamedQuery(Meal.GET, Meal.class)
                 .setParameter("id", id)
                 .setParameter("userId", userId)
-                .getResultStream()
-                .limit(2)
-                .toArray();
-        return (meals.length == 1) ? (Meal) meals[0] : null;
+                .getResultList();
+        return DataAccessUtils.singleResult(meals); // exceptions asked to ignore
     }
 
     @Override

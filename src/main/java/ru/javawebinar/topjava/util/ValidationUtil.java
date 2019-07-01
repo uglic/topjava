@@ -42,14 +42,4 @@ public class ValidationUtil {
             throw new IllegalArgumentException(entity + " must be with id=" + id);
         }
     }
-
-    public static <T> T throwUpdateError(AbstractBaseEntity entity, RuntimeException exception) {
-        Throwable rootCause = exception;
-        Throwable nextCause;
-        while ((nextCause = rootCause.getCause()) != null) {
-            rootCause = nextCause;
-        }
-        String message = rootCause.getMessage();
-        throw new NotFoundException("Cannot update entity with id=" + entity.getId() + ":" + message);
-    }
 }
