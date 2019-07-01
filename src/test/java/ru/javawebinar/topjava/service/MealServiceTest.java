@@ -19,7 +19,6 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
@@ -51,8 +50,6 @@ public class MealServiceTest {
         @Override
         protected void finished(long nanos, Description description) {
             String testName = description.getMethodName();
-
-
             String spacing = String.valueOf(new char[MAX_LINE_LEN - testName.length()]).replace('\0', '.');
             String logMessage = "\nTest ";
             logMessage += ANSI_GREEN + testName;
@@ -72,7 +69,6 @@ public class MealServiceTest {
 
     @AfterClass
     public static void finish() {
-        long endTimeNanos = System.nanoTime();
         logger.info("\nResult of tests:");
         logger.info("\n" + totalLog);
     }
