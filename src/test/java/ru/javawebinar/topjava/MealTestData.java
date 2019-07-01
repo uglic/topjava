@@ -34,7 +34,7 @@ public class MealTestData {
     }
 
     public static void assertMatch(Meal actual, Meal expected) {
-        assertThat(actual).isEqualToComparingFieldByField(expected);
+        assertThat(actual).isEqualToIgnoringGivenFields(expected, "user");
     }
 
     public static void assertMatch(Iterable<Meal> actual, Meal... expected) {
@@ -42,6 +42,30 @@ public class MealTestData {
     }
 
     public static void assertMatch(Iterable<Meal> actual, Iterable<Meal> expected) {
-        assertThat(actual).usingFieldByFieldElementComparator().isEqualTo(expected);
+        assertThat(actual).usingElementComparatorIgnoringFields("user").isEqualTo(expected);
+    }
+
+    public static String getStringOfLength(int length, char character) {
+        return (length < 0) ?
+                null
+                : String.valueOf(new char[length]).replace('\0', character);
+    }
+
+    public static Meal getNewMeal(int descriptionLength, int calories) {
+        return getNewMeal(descriptionLength, 'z', calories);
+    }
+
+    public static Meal getNewMeal(int descriptionLength, char character, int calories) {
+        return new Meal(
+                of(2019, Month.JUNE, 30, 9, 15),
+                getStringOfLength(descriptionLength, character),
+                calories);
+    }
+
+    public static Meal getMealForUpdate(Meal meal) {
+        return new Meal(meal.getId(),
+                meal.getDateTime(),
+                meal.getDescription(),
+                meal.getCalories());
     }
 }

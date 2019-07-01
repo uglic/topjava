@@ -2,7 +2,6 @@ package ru.javawebinar.topjava.service;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -14,6 +13,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import java.time.LocalDate;
 import java.time.Month;
 
+import static ru.javawebinar.topjava.MealTestData.assertMatch;
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
@@ -92,5 +92,77 @@ public class MealServiceTest {
         assertMatch(service.getBetweenDates(
                 LocalDate.of(2015, Month.MAY, 30),
                 LocalDate.of(2015, Month.MAY, 30), USER_ID), MEAL3, MEAL2, MEAL1);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void createDescriptionNull() {
+        service.create(getNewMeal(-1, Meal.MIN_CALORIES_VALUE + 1), USER_ID);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void createDescriptionBlank() {
+        service.create(getNewMeal(Meal.MIN_DESCRIPTION_LEN, ' ', Meal.MIN_CALORIES_VALUE + 1), USER_ID);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void createDescriptionShort() {
+        service.create(getNewMeal(Meal.MIN_DESCRIPTION_LEN - 1, Meal.MIN_CALORIES_VALUE), USER_ID);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void createDescriptionLong() {
+        service.create(getNewMeal(Meal.MAX_DESCRIPTION_LEN + 1, Meal.MIN_CALORIES_VALUE), USER_ID);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void createCaloriesLow() {
+        service.create(getNewMeal(Meal.MIN_DESCRIPTION_LEN, Meal.MIN_CALORIES_VALUE - 1), USER_ID);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void createCaloriesHigh() {
+        service.create(getNewMeal(Meal.MIN_DESCRIPTION_LEN, Meal.MAX_CALORIES_VALUE + 1), USER_ID);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void updateDescriptionNull() {
+        Meal meal = getMealForUpdate(MEAL1);
+        meal.setDescription(getStringOfLength(-1, 'z'));
+        service.update(meal, USER_ID);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void updateDescriptionBlank() {
+        Meal meal = getMealForUpdate(MEAL1);
+        meal.setDescription(getStringOfLength(Meal.MIN_DESCRIPTION_LEN, ' '));
+        service.update(meal, USER_ID);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void updateDescriptionShort() {
+        Meal meal = getMealForUpdate(MEAL1);
+        meal.setDescription(getStringOfLength(Meal.MIN_DESCRIPTION_LEN - 1, 'z'));
+        service.update(meal, USER_ID);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void updateDescriptionLong() {
+        Meal meal = getMealForUpdate(MEAL1);
+        meal.setDescription(getStringOfLength(Meal.MAX_DESCRIPTION_LEN + 1, 'z'));
+        service.update(meal, USER_ID);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void updateCaloriesLow() {
+        Meal meal = getMealForUpdate(MEAL1);
+        meal.setCalories(Meal.MIN_CALORIES_VALUE - 1);
+        service.update(meal, USER_ID);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void updateCaloriesHigh() {
+        Meal meal = getMealForUpdate(MEAL1);
+        meal.setCalories(Meal.MAX_CALORIES_VALUE + 1);
+        service.update(meal, USER_ID);
     }
 }
