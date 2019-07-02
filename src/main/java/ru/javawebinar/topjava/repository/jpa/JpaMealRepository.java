@@ -53,7 +53,7 @@ public class JpaMealRepository implements MealRepository {
                 .setParameter("id", id)
                 .setParameter("userId", userId)
                 .getResultList();
-        return DataAccessUtils.singleResult(meals); // exceptions asked to ignore
+        return DataAccessUtils.singleResult(meals);
     }
 
     @Override

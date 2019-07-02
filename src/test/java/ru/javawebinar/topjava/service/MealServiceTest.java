@@ -1,12 +1,16 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -18,6 +22,8 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -31,13 +37,8 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @RunWith(SpringJUnit4ClassRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
-    private static final Logger logger = LoggerFactory.getLogger("");
-
-    private static final int MAX_LINE_LEN = 40;
-    private static final String ANSI_RESET = "\u001B[0m";
-    private static final String ANSI_GREEN = "\u001B[32m";
-    private static final String ANSI_YELLOW = "\u001B[33m";
-    private static String totalLog;
+    private static final Logger logger = LoggerFactory.getLogger(MealServiceTest.class);
+    private static List<TestLogRecord> totalLog = new ArrayList<>();
 
     @Autowired
     private MealService service;
@@ -49,28 +50,42 @@ public class MealServiceTest {
     public Stopwatch stopwatch = new Stopwatch() {
         @Override
         protected void finished(long nanos, Description description) {
-            String testName = description.getMethodName();
-            String spacing = String.valueOf(new char[MAX_LINE_LEN - testName.length()]).replace('\0', '.');
-            String logMessage = "\nTest ";
-            logMessage += ANSI_GREEN + testName;
-            logMessage += ANSI_RESET + " " + spacing;
-            logMessage += ANSI_YELLOW + String.format("%5d", TimeUnit.NANOSECONDS.toMillis(nanos));
-            logMessage += ANSI_RESET;
-            logMessage += " milliseconds";
-            logger.info(logMessage);
-            totalLog += logMessage;
+            TestLogRecord record = new TestLogRecord();
+            record.testName = description.getMethodName();
+            record.timeMillis = TimeUnit.NANOSECONDS.toMillis(nanos);
+            record.log();
+            totalLog.add(record);
         }
     };
 
+    private static class TestLogRecord {
+        String testName;
+        Long timeMillis;
+
+        void log() {
+            MDC.put("testName", testName);
+            MDC.put("timeMillis", String.format("%d", timeMillis));
+            logger.info(new StringBuilder() // if MDC class is not used
+                    .append("Test [")
+                    .append(testName)
+                    .append("] finished in ")
+                    .append(timeMillis)
+                    .append(" milliseconds")
+                    .toString());
+            MDC.remove("testName");
+            MDC.remove("timeMillis");
+        }
+    }
+
     @BeforeClass
     public static void setup() {
-        totalLog = "";
+        totalLog.clear();
     }
 
     @AfterClass
     public static void finish() {
         logger.info("\nResult of tests:");
-        logger.info("\n" + totalLog);
+        totalLog.forEach(TestLogRecord::log);
     }
 
     @Test
