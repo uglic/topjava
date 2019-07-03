@@ -5,47 +5,15 @@
     </contextListener>
 
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-            <evaluator>
-                <expression>
-                    !logger.matches(".*Test\\b") || !mdc.containsKey("testName") || !mdc.containsKey("timeMillis")
-                </expression>
-            </evaluator>
-            <OnMismatch>DENY</OnMismatch>
-            <OnMatch>NEUTRAL</OnMatch>
-        </filter>
-        <withJansi>true</withJansi>
         <encoder>
             <charset>UTF-8</charset>
             <pattern>%d{HH:mm:ss.SSS} %-5level %class{50}.%M:%L - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <appender name="consoleTestResults" class="ch.qos.logback.core.ConsoleAppender">
-        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-            <evaluator>
-                <expression>
-                    logger.matches(".*Test\\b")
-                    &amp;&amp; mdc.containsKey("testName")
-                    &amp;&amp; mdc.containsKey("timeMillis")
-                </expression>
-            </evaluator>
-            <OnMismatch>DENY</OnMismatch>
-            <OnMatch>NEUTRAL</OnMatch>
-        </filter>
-        <withJansi>true</withJansi>
-        <encoder>
-            <charset>UTF-8</charset>
-            <pattern>%cyan(%logger{25}) %yellow(%replace(%-25X{testName}){' ','.'}).%green(%replace(%5X{timeMillis}){' ','.'}) millis%n</pattern>
-            <!-- default without mdc --><!--pattern>%d{HH:mm:ss.SSS} %-5level %class{50}.%M:%L - %msg%n</pattern-->
-        </encoder>
-    </appender>
-
     <logger name="org.postgresql" level="debug"/>
     <logger name="org.springframework.jdbc" level="debug"/>
-    <logger name="ru.javawebinar.topjava" level="debug">
-        <appender-ref ref="consoleTestResults"/>
-    </logger>
+    <logger name="ru.javawebinar.topjava" level="debug"/>
 
     <root level="INFO">
         <appender-ref ref="console" />

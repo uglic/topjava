@@ -10,7 +10,6 @@ import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -22,8 +21,6 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -38,7 +35,7 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(MealServiceTest.class);
-    private static List<TestLogRecord> totalLog = new ArrayList<>();
+    private static StringBuilder totalLog = new StringBuilder();
 
     @Autowired
     private MealService service;
@@ -50,42 +47,21 @@ public class MealServiceTest {
     public Stopwatch stopwatch = new Stopwatch() {
         @Override
         protected void finished(long nanos, Description description) {
-            TestLogRecord record = new TestLogRecord();
-            record.testName = description.getMethodName();
-            record.timeMillis = TimeUnit.NANOSECONDS.toMillis(nanos);
-            record.log();
-            totalLog.add(record);
+            String line = description.getMethodName() + " " + TimeUnit.NANOSECONDS.toMillis(nanos);
+            logger.info(line);
+            totalLog.append("\n").append(line);
         }
     };
 
-    private static class TestLogRecord {
-        String testName;
-        Long timeMillis;
-
-        void log() {
-            MDC.put("testName", testName);
-            MDC.put("timeMillis", String.format("%d", timeMillis));
-            logger.info(new StringBuilder() // if MDC class is not used
-                    .append("Test [")
-                    .append(testName)
-                    .append("] finished in ")
-                    .append(timeMillis)
-                    .append(" milliseconds")
-                    .toString());
-            MDC.remove("testName");
-            MDC.remove("timeMillis");
-        }
-    }
-
     @BeforeClass
     public static void setup() {
-        totalLog.clear();
+        totalLog.delete(0, totalLog.length());
     }
 
     @AfterClass
     public static void finish() {
-        logger.info("\nResult of tests:");
-        totalLog.forEach(TestLogRecord::log);
+        totalLog.insert(0, "\nResult of tests (milliseconds):");
+        logger.info(totalLog.toString());
     }
 
     @Test
