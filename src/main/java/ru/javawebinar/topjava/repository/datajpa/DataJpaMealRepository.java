@@ -1,10 +1,7 @@
 package ru.javawebinar.topjava.repository.datajpa;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.MealRepository;
 
 import java.time.LocalDateTime;
@@ -12,21 +9,33 @@ import java.util.List;
 
 @Repository
 public class DataJpaMealRepository implements MealRepository {
-    private static final Sort SORT = new Sort(Sort.Direction.DESC, "date_time");
-
-
-    @Autowired
     private CrudMealRepository crudRepository;
+    private CrudUserRepository userRepository;
+
+    public DataJpaMealRepository(CrudMealRepository crudMealRepository, CrudUserRepository userRepository) {
+        this.crudRepository = crudMealRepository;
+        this.userRepository = userRepository;
+    }
 
     @Override
     public Meal save(Meal meal, int userId) {
-        if (!meal.isNew()) {
-            Integer mealId = meal.getId();
-            if (mealId == null || get(mealId, userId) == null) {
-                return null;
+        if (meal != null) {
+            // !meal.isNew() && ( (mealId = meal.getId()) == null || (persisted = get(mealId, userId)) == null )
+            if (!meal.isNew()) {
+                Integer mealId = meal.getId();
+                if (mealId != null) {
+                    Meal persisted = get(mealId, userId);
+                    if (persisted != null) {
+                        meal.setUser(persisted.getUser());
+                        return crudRepository.save(meal);
+                    }
+                }
+            } else {
+                meal.setUser(userRepository.getOne(userId));
+                return crudRepository.save(meal);
             }
         }
-        return crudRepository.save(meal);
+        return null;
     }
 
     @Override
@@ -36,21 +45,12 @@ public class DataJpaMealRepository implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        return crudRepository.findById(id)
-                .filter(m -> {
-                    User user = m.getUser();
-                    if (user != null) {
-                        Integer uid = user.getId();
-                        return uid != null && uid == userId;
-                    }
-                    return false;
-                })
-                .orElse(null);
+        return crudRepository.getByIdAndUserId(id, userId).orElse(null);
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        return crudRepository.findAll(SORT);
+        return crudRepository.getByUserIdOrderByDateTimeDesc(userId);
     }
 
     @Override
