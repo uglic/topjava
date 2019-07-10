@@ -28,4 +28,8 @@ public interface MealRepository {
     default Map<User, List<Meal>> getUserWithMeals(int userId) {
         return new HashMap<>();
     }
+
+    default Map<Meal, User> getWithUser(int id, int userId) {
+        return new HashMap<>();
+    }
 }

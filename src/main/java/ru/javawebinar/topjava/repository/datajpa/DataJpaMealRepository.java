@@ -64,4 +64,15 @@ public class DataJpaMealRepository implements MealRepository {
         map.put(user, getAll(userId));
         return map;
     }
+
+    @Override
+    public Map<Meal, User> getWithUser(int id, int userId) {
+        Meal meal = get(id, userId);
+        HashMap<Meal, User> map = new HashMap<>();
+        if (meal != null) {
+            User user = userRepository.findById(meal.getUser().getId()).orElse(null) ;
+            map.put(meal, user);
+        }
+        return map;
+    }
 }

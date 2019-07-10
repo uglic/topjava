@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.javawebinar.topjava.MealTestData.MEALS;
+import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.USER;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
 
@@ -25,5 +25,16 @@ public class MealServiceDataJpaTest extends AbstractMealServiceTest {
         assertThat(1).isEqualTo(userWithMeals.size());
         assertThat(USER).isEqualToIgnoringGivenFields(userPersisted, "registered", "roles");
         assertThat(MEALS).usingElementComparatorIgnoringFields("user").isEqualTo(mealsPersisted);
+    }
+
+    @Test
+    public void getWithUser(){
+        Map<Meal, User> mealWithUser = getService().getWithUser(MEAL1_ID, USER_ID);
+        Meal mealPersisted = mealWithUser.keySet().iterator().next();
+        User userPersisted = mealWithUser.get(mealPersisted);
+
+        assertThat(1).isEqualTo(mealWithUser.size());
+        assertThat(MEAL1).isEqualToIgnoringGivenFields(mealPersisted, "user");
+        assertThat(USER).isEqualToIgnoringGivenFields(userPersisted, "registered", "roles");
     }
 }

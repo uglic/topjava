@@ -11,6 +11,7 @@ import ru.javawebinar.topjava.repository.MealRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,7 +61,12 @@ public class MealService {
         return repository.save(meal, userId);
     }
 
-    public Map<User, List<Meal>> getUserWithMeals(int userId){
+    public Map<User, List<Meal>> getUserWithMeals(int userId) {
         return repository.getUserWithMeals(userId);
     }
+
+    public Map<Meal, User> getWithUser(int id, int userId) {
+        return repository.getWithUser(id, userId);
+    }
+
 }
