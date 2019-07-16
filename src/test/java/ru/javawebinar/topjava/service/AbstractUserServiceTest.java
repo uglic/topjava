@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.dao.DataAccessException;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
@@ -15,6 +17,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import static ru.javawebinar.topjava.Profiles.JDBC;
 import static ru.javawebinar.topjava.UserTestData.*;
 
 public abstract class AbstractUserServiceTest extends AbstractServiceTest {
@@ -25,13 +28,22 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     @Autowired
     private CacheManager cacheManager;
 
-    @Autowired
+    //@Autowired
     protected JpaUtil jpaUtil;
+
+    @Autowired
+    Environment environment;
+
+    @Autowired
+    ApplicationContext context;
 
     @Before
     public void setUp() throws Exception {
         cacheManager.getCache("users").clear();
-        jpaUtil.clear2ndLevelHibernateCache();
+        if (isUseJpaUtil()) {
+            jpaUtil = context.getBean(JpaUtil.class);
+            jpaUtil.clear2ndLevelHibernateCache();
+        }
     }
 
     @Test
@@ -98,5 +110,15 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
         validateRootCause(() -> service.create(new User(null, "User", "mail@yandex.ru", "  ", Role.ROLE_USER)), ConstraintViolationException.class);
         validateRootCause(() -> service.create(new User(null, "User", "mail@yandex.ru", "password", 9, true, new Date(), Collections.emptySet())), ConstraintViolationException.class);
         validateRootCause(() -> service.create(new User(null, "User", "mail@yandex.ru", "password", 10001, true, new Date(), Collections.emptySet())), ConstraintViolationException.class);
+    }
+
+    @Autowired
+    private boolean isUseJpaUtil() {
+        for (String profile : environment.getActiveProfiles()) {
+            if (JDBC.equalsIgnoreCase(profile)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
