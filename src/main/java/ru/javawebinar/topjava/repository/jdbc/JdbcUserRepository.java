@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.repository.jdbc;
 
-import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -20,6 +19,8 @@ import javax.validation.ConstraintViolationException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
+
+import static ru.javawebinar.topjava.util.ValidationUtil.*;
 
 @Repository
 @Transactional(readOnly = true)
@@ -54,8 +55,8 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     @Transactional
     public User save(User user) {
-        BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
         checkConstraints(user);
+        BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
             user.setId(newKey.intValue());
@@ -151,42 +152,34 @@ public class JdbcUserRepository implements UserRepository {
         users.forEach(u -> u.setRoles(userRolesMap.get(u.getId())));
     }
 
-    private ConstraintViolation<User> getSimpleViolation(String message, Object value) {
-        return ConstraintViolationImpl.forParameterValidation(
-                message,
-                null, null, null,
-                null, null, null, value,
-                null, null, null, null,
-                null);
-    }
-
     private void checkConstraints(User user) {
         Set<ConstraintViolation<?>> violations = new HashSet<>();
-        fillViolations(user.getName(), "{username}", FIELD_NAME_MIN_LENGTH, FIELD_NAME_MAX_LENGTH, violations);
-        fillViolations(user.getEmail(), "{email}", null, FIELD_EMAIL_MAX_LENGTH, violations);
-        fillViolations(user.getPassword(), "{password}", FIELD_PASSWORD_MIN_LENGTH, FIELD_PASSWORD_MAX_LENGTH, violations);
-        fillViolations(user.getCaloriesPerDay(), "{caloriesPerDay}", FIELD_CALORIES_MIN, FIELD_CALORIES_MAX, violations);
+        String strValue, field;
+
+        strValue = user.getName();
+        field = "{username}";
+        addIfViolateNonBlank(strValue, field, violations);
+        addIfViolateMinLength(strValue, field, violations, FIELD_NAME_MIN_LENGTH);
+        addIfViolateMaxLength(strValue, field, violations, FIELD_NAME_MAX_LENGTH);
+
+        strValue = user.getEmail();
+        field = "{email}";
+        addIfViolateNonBlank(strValue, field, violations);
+        addIfViolateMaxLength(strValue, field, violations, FIELD_EMAIL_MAX_LENGTH);
+
+        strValue = user.getPassword();
+        field = "{password}";
+        addIfViolateNonBlank(strValue, field, violations);
+        addIfViolateMinLength(strValue, field, violations, FIELD_PASSWORD_MIN_LENGTH);
+        addIfViolateMaxLength(strValue, field, violations, FIELD_PASSWORD_MAX_LENGTH);
+
+        int intValue = user.getCaloriesPerDay();
+        field = "{caloriesPerDay}";
+        addIfViolateMinValue(intValue, field, violations, FIELD_CALORIES_MIN);
+        addIfViolateMaxValue(intValue, field, violations, FIELD_CALORIES_MAX);
 
         if (violations.size() > 0) {
             throw new ConstraintViolationException(violations);
-        }
-    }
-
-    private void fillViolations(String value, String field, Integer minValue, Integer maxValue, Set<ConstraintViolation<?>> violations) {
-        if (value == null || value.isBlank()) {
-            violations.add(getSimpleViolation(field + " must not be blank", value));
-        } else if (minValue != null && value.length() < minValue) {
-            violations.add(getSimpleViolation(field + " length must be not less then " + minValue, value));
-        } else if (maxValue != null && value.length() > maxValue) {
-            violations.add(getSimpleViolation(field + " length must be not greater then " + maxValue, value));
-        }
-    }
-
-    private void fillViolations(int value, String field, Integer minValue, Integer maxValue, Set<ConstraintViolation<?>> violations) {
-        if (minValue != null && value < minValue) {
-            violations.add(getSimpleViolation(field + " must be not less then " + minValue, value));
-        } else if (maxValue != null && value > maxValue) {
-            violations.add(getSimpleViolation(field + " must be not greater then " + maxValue, value));
         }
     }
 }
