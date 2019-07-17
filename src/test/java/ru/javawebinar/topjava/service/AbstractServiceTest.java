@@ -7,6 +7,9 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -16,6 +19,7 @@ import ru.javawebinar.topjava.ActiveDbProfileResolver;
 import ru.javawebinar.topjava.TimingRules;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static ru.javawebinar.topjava.Profiles.JDBC;
 import static ru.javawebinar.topjava.util.ValidationUtil.getRootCause;
 
 @ContextConfiguration({
@@ -35,6 +39,12 @@ abstract public class AbstractServiceTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
+    @Autowired
+    Environment environment;
+
+    @Autowired
+    ApplicationContext context;
+
     //  Check root cause in JUnit: https://github.com/junit-team/junit4/pull/778
     public <T extends Throwable> void validateRootCause(Runnable runnable, Class<T> exceptionClass) {
         try {
@@ -44,4 +54,14 @@ abstract public class AbstractServiceTest {
             Assert.assertThat(getRootCause(e), instanceOf(exceptionClass));
         }
     }
+
+    public boolean isUseJpaUtil() {
+        for (String profile : environment.getActiveProfiles()) {
+            if (JDBC.equalsIgnoreCase(profile)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
