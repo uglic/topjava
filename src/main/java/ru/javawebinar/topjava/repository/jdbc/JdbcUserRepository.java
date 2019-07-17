@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.repository.jdbc;
 
+import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -14,6 +15,8 @@ import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
@@ -30,6 +33,14 @@ public class JdbcUserRepository implements UserRepository {
 
     private final SimpleJdbcInsert insertUser;
 
+    private final int FIELD_NAME_MIN_LENGTH = 2;
+    private final int FIELD_NAME_MAX_LENGTH = 100;
+    private final int FIELD_EMAIL_MAX_LENGTH = 100;
+    private final int FIELD_PASSWORD_MIN_LENGTH = 5;
+    private final int FIELD_PASSWORD_MAX_LENGTH = 100;
+    private final int FIELD_CALORIES_MIN = 10;
+    private final int FIELD_CALORIES_MAX = 10000;
+
     @Autowired
     public JdbcUserRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.insertUser = new SimpleJdbcInsert(jdbcTemplate)
@@ -44,7 +55,7 @@ public class JdbcUserRepository implements UserRepository {
     @Transactional
     public User save(User user) {
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
-
+        checkConstraints(user);
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
             user.setId(newKey.intValue());
@@ -138,5 +149,44 @@ public class JdbcUserRepository implements UserRepository {
                         ur -> userRolesMap.computeIfAbsent((Integer) ur.get("user_id"), k -> new HashSet<>())
                                 .add(Role.valueOf((String) ur.get("role"))));
         users.forEach(u -> u.setRoles(userRolesMap.get(u.getId())));
+    }
+
+    private ConstraintViolation<User> getSimpleViolation(String message, Object value) {
+        return ConstraintViolationImpl.forParameterValidation(
+                message,
+                null, null, null,
+                null, null, null, value,
+                null, null, null, null,
+                null);
+    }
+
+    private void checkConstraints(User user) {
+        Set<ConstraintViolation<?>> violations = new HashSet<>();
+        fillViolations(user.getName(), "{username}", FIELD_NAME_MIN_LENGTH, FIELD_NAME_MAX_LENGTH, violations);
+        fillViolations(user.getEmail(), "{email}", null, FIELD_EMAIL_MAX_LENGTH, violations);
+        fillViolations(user.getPassword(), "{password}", FIELD_PASSWORD_MIN_LENGTH, FIELD_PASSWORD_MAX_LENGTH, violations);
+        fillViolations(user.getCaloriesPerDay(), "{caloriesPerDay}", FIELD_CALORIES_MIN, FIELD_CALORIES_MAX, violations);
+
+        if (violations.size() > 0) {
+            throw new ConstraintViolationException(violations);
+        }
+    }
+
+    private void fillViolations(String value, String field, Integer minValue, Integer maxValue, Set<ConstraintViolation<?>> violations) {
+        if (value == null || value.isBlank()) {
+            violations.add(getSimpleViolation(field + " must not be blank", value));
+        } else if (minValue != null && value.length() < minValue) {
+            violations.add(getSimpleViolation(field + " length must be not less then " + minValue, value));
+        } else if (maxValue != null && value.length() > maxValue) {
+            violations.add(getSimpleViolation(field + " length must be not greater then " + maxValue, value));
+        }
+    }
+
+    private void fillViolations(int value, String field, Integer minValue, Integer maxValue, Set<ConstraintViolation<?>> violations) {
+        if (minValue != null && value < minValue) {
+            violations.add(getSimpleViolation(field + " must be not less then " + minValue, value));
+        } else if (maxValue != null && value > maxValue) {
+            violations.add(getSimpleViolation(field + " must be not greater then " + maxValue, value));
+        }
     }
 }
