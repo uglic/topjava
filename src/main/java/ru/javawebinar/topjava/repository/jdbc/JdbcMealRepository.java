@@ -113,10 +113,10 @@ public class JdbcMealRepository implements MealRepository {
         field = "{dateTime}";
         addIfViolateNotNull(meal.getDateTime(), field, violations);
 
-//        int intValue = meal.getCalories();
-//        field = "{calories}";
-//        addIfViolateMinValue(intValue, field, violations, FIELD_CALORIES_MIN);
-//        addIfViolateMaxValue(intValue, field, violations, FIELD_CALORIES_MAX);
+        int intValue = meal.getCalories();
+        field = "{calories}";
+        addIfViolateMinValue(intValue, field, violations, FIELD_CALORIES_MIN);
+        addIfViolateMaxValue(intValue, field, violations, FIELD_CALORIES_MAX);
 
         if (violations.size() > 0) {
             throw new ConstraintViolationException(violations);

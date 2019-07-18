@@ -171,10 +171,10 @@ public class JdbcUserRepository implements UserRepository {
         addIfViolateMinLength(strValue, field, violations, FIELD_PASSWORD_MIN_LENGTH);
         addIfViolateMaxLength(strValue, field, violations, FIELD_PASSWORD_MAX_LENGTH);
 
-//        int intValue = user.getCaloriesPerDay();
-//        field = "{caloriesPerDay}";
-//        addIfViolateMinValue(intValue, field, violations, FIELD_CALORIES_PER_DAY_MIN);
-//        addIfViolateMaxValue(intValue, field, violations, FIELD_CALORIES_PER_DAY_MAX);
+        int intValue = user.getCaloriesPerDay();
+        field = "{caloriesPerDay}";
+        addIfViolateMinValue(intValue, field, violations, FIELD_CALORIES_PER_DAY_MIN);
+        addIfViolateMaxValue(intValue, field, violations, FIELD_CALORIES_PER_DAY_MAX);
 
         if (violations.size() > 0) {
             throw new ConstraintViolationException(violations);

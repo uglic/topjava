@@ -65,11 +65,12 @@ abstract public class AbstractServiceTest {
     }
 
     public boolean isRunTestValidation() {
-        for (String profile : environment.getActiveProfiles()) {
-            if (JDBC.equalsIgnoreCase(profile)) {
-                return false;
-            }
-        }
         return true;
+//        for (String profile : environment.getActiveProfiles()) {
+//            if (JDBC.equalsIgnoreCase(profile)) {
+//                return false;
+//            }
+//        }
+//        return true;
     }
 }
