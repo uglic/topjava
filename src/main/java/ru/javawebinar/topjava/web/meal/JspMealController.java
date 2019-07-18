@@ -32,13 +32,13 @@ public class JspMealController extends AbstractMealController {
     }
 
     @GetMapping("/delete")
-    public String mealsDelete(@RequestParam("id") int id) {
+    public String delete(Model model, @RequestParam("id") int id) {
         delete(id);
         return "redirect:/meals";
     }
 
     @GetMapping("/create")
-    public String mealsCreate(Model model) {
+    public String create(Model model) {
         final Meal meal = new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000);
         model.addAttribute("action", "create");
         model.addAttribute("meal", meal);
@@ -46,7 +46,7 @@ public class JspMealController extends AbstractMealController {
     }
 
     @GetMapping("/update")
-    public String mealsUpdate(Model model, @RequestParam("id") int id) {
+    public String update(Model model, @RequestParam("id") int id) {
         final Meal meal = get(id);
         model.addAttribute("action", "update");
         model.addAttribute("meal", meal);
@@ -54,7 +54,7 @@ public class JspMealController extends AbstractMealController {
     }
 
     @GetMapping("/filter")
-    public String mealsFilter(Model model,
+    public String filter(Model model,
                               @RequestParam("startDate") String startDateString,
                               @RequestParam("endDate") String endDateString,
                               @RequestParam("startTime") String startTimeString,
@@ -64,12 +64,6 @@ public class JspMealController extends AbstractMealController {
         LocalTime startTime = parseLocalTime(startTimeString);
         LocalTime endTime = parseLocalTime(endTimeString);
         model.addAttribute("meals", getBetween(startDate, startTime, endDate, endTime));
-        return "meals";
-    }
-
-    @GetMapping
-    public String mealsAll(Model model) {
-        model.addAttribute("meals", getAll());
         return "meals";
     }
 
@@ -87,5 +81,11 @@ public class JspMealController extends AbstractMealController {
             update(meal, Integer.parseInt(Objects.requireNonNull(request.getParameter("id"))));
         }
         return "redirect:meals";
+    }
+
+    @GetMapping
+    public String all(Model model) {
+        model.addAttribute("meals", getAll());
+        return "meals";
     }
 }

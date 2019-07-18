@@ -89,6 +89,15 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    public void updateSeveralRoles() throws Exception {
+        User updated = new User(ADMIN);
+        updated.setName("UpdatedNameAdmin");
+        updated.setCaloriesPerDay(330);
+        service.update(updated);
+        assertMatch(service.get(ADMIN_ID), updated);
+    }
+
+    @Test
     public void getAll() throws Exception {
         List<User> all = service.getAll();
         assertMatch(all, ADMIN, USER);

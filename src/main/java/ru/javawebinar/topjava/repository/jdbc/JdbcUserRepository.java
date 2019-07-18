@@ -66,7 +66,7 @@ public class JdbcUserRepository implements UserRepository {
                 parameterSource)) {
             return null;
         } else {
-            deleteRoles(user); // better delete+insert only difference but not here
+            deleteRoles(user);
         }
         insertRoles(user);
         return user;
@@ -105,15 +105,11 @@ public class JdbcUserRepository implements UserRepository {
         int[] affected = jdbcTemplate.batchUpdate("INSERT INTO user_roles(user_id, role) VALUES (?, ?)",
                 new BatchPreparedStatementSetter() {
                     private final int userId = user.getId();
-                    private int counter = 0;
+                    private final Iterator<Role> iterator = user.getRoles().iterator();
 
                     @Override
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        if (counter != i) {
-                            throw new IllegalArgumentException("Single direction list");
-                        }
-                        counter++;
-                        Role role = user.getRoles().iterator().next();
+                        Role role = iterator.next();
                         ps.setInt(1, userId);
                         ps.setString(2, role.name());
                     }
