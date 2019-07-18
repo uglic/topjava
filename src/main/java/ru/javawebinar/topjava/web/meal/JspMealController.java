@@ -31,13 +31,13 @@ public class JspMealController extends AbstractMealController {
         super(service);
     }
 
-    @GetMapping(params = {"action=delete"})
+    @GetMapping("/delete")
     public String mealsDelete(@RequestParam("id") int id) {
         delete(id);
         return "redirect:/meals";
     }
 
-    @GetMapping(params = {"action=create"})
+    @GetMapping("/create")
     public String mealsCreate(Model model) {
         final Meal meal = new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000);
         model.addAttribute("action", "create");
@@ -45,7 +45,7 @@ public class JspMealController extends AbstractMealController {
         return "mealForm";
     }
 
-    @GetMapping(params = {"action=update"})
+    @GetMapping("/update")
     public String mealsUpdate(Model model, @RequestParam("id") int id) {
         final Meal meal = get(id);
         model.addAttribute("action", "update");
@@ -53,7 +53,7 @@ public class JspMealController extends AbstractMealController {
         return "mealForm";
     }
 
-    @GetMapping(params = {"action=filter"})
+    @GetMapping("/filter")
     public String mealsFilter(Model model,
                               @RequestParam("startDate") String startDateString,
                               @RequestParam("endDate") String endDateString,

@@ -7,12 +7,11 @@
 <body>
 <jsp:include page="fragments/bodyHeader.jsp"/>
 <section>
-    <h2>
-        <c:if test="param.action == 'create'"><spring:message code="meal.header.create"/></c:if>
-        <c:if test="param.action != 'create'"><spring:message code="meal.header.edit"/></c:if>
-    </h2>
+    <c:set var="msgCreate"><spring:message code="meal.header.create"/></c:set>
+    <c:set var="msgEdit"><spring:message code="meal.header.edit"/></c:set>
+    <h2>${action == 'create' ? msgCreate : msgEdit}</h2>
     <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
-    <form method="post" action="meals">
+    <form method="post" action="${pageContext.request.contextPath}/meals">
         <input type="hidden" name="id" value="${meal.id}">
         <dl>
             <dt><spring:message code="meal.header.dateTime"/>:</dt>

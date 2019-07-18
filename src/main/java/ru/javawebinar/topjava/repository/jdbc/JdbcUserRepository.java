@@ -39,8 +39,8 @@ public class JdbcUserRepository implements UserRepository {
     private final int FIELD_EMAIL_MAX_LENGTH = 100;
     private final int FIELD_PASSWORD_MIN_LENGTH = 5;
     private final int FIELD_PASSWORD_MAX_LENGTH = 100;
-    private final int FIELD_CALORIES_MIN = 10;
-    private final int FIELD_CALORIES_MAX = 10000;
+    private final int FIELD_CALORIES_PER_DAY_MIN = 10;
+    private final int FIELD_CALORIES_PER_DAY_MAX = 10000;
 
     @Autowired
     public JdbcUserRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
@@ -82,9 +82,7 @@ public class JdbcUserRepository implements UserRepository {
     public User get(int id) {
         List<User> users = jdbcTemplate.query("SELECT * FROM users WHERE id=?", ROW_MAPPER, id);
         final User user = DataAccessUtils.singleResult(users);
-        if (user != null) {
-            user.setRoles(getRolesForUserId(id));
-        }
+        readRoles(user);
         return user;
     }
 
@@ -92,9 +90,7 @@ public class JdbcUserRepository implements UserRepository {
     public User getByEmail(String email) {
         List<User> users = jdbcTemplate.query("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
         User user = DataAccessUtils.singleResult(users);
-        if (user != null) {
-            user.setRoles(getRolesForUserId(user.getId()));
-        }
+        readRoles(user);
         return user;
     }
 
@@ -138,9 +134,11 @@ public class JdbcUserRepository implements UserRepository {
         jdbcTemplate.update("DELETE FROM user_roles WHERE user_id=?", user.getId());
     }
 
-    private List<Role> getRolesForUserId(int id) {
-        return jdbcTemplate.queryForList("SELECT role FROM user_roles WHERE user_id=?",
-                new Integer[]{id}, Role.class);
+    private void readRoles(User user) {
+        if (user != null) {
+            user.setRoles(jdbcTemplate.queryForList("SELECT role FROM user_roles WHERE user_id=?",
+                    new Integer[]{user.getId()}, Role.class));
+        }
     }
 
     private void setRoles(List<User> users) {
@@ -173,10 +171,10 @@ public class JdbcUserRepository implements UserRepository {
         addIfViolateMinLength(strValue, field, violations, FIELD_PASSWORD_MIN_LENGTH);
         addIfViolateMaxLength(strValue, field, violations, FIELD_PASSWORD_MAX_LENGTH);
 
-        int intValue = user.getCaloriesPerDay();
-        field = "{caloriesPerDay}";
-        addIfViolateMinValue(intValue, field, violations, FIELD_CALORIES_MIN);
-        addIfViolateMaxValue(intValue, field, violations, FIELD_CALORIES_MAX);
+//        int intValue = user.getCaloriesPerDay();
+//        field = "{caloriesPerDay}";
+//        addIfViolateMinValue(intValue, field, violations, FIELD_CALORIES_PER_DAY_MIN);
+//        addIfViolateMaxValue(intValue, field, violations, FIELD_CALORIES_PER_DAY_MAX);
 
         if (violations.size() > 0) {
             throw new ConstraintViolationException(violations);
