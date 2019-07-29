@@ -1,5 +1,8 @@
 package ru.javawebinar.topjava.to;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDateTime;
 
 public class MealTo {
@@ -39,6 +42,15 @@ public class MealTo {
 
     public boolean isExcess() {
         return excess;
+    }
+
+    @JsonCreator
+    public static MealTo makeMealTo(@JsonProperty("id") Integer id,
+                                    @JsonProperty("dateTime") LocalDateTime dateTime,
+                                    @JsonProperty("description") String description,
+                                    @JsonProperty("calories") int calories,
+                                    @JsonProperty("excess") boolean excess) {
+        return new MealTo(id, dateTime, description, calories, excess);
     }
 
     @Override
