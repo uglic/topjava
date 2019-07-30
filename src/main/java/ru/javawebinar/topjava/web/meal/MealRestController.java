@@ -1,6 +1,7 @@
 package ru.javawebinar.topjava.web.meal;
 
-import org.springframework.format.annotation.DateTimeFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -8,9 +9,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
+import ru.javawebinar.topjava.util.DateTimeUtil;
+import ru.javawebinar.topjava.web.convert.StringToLocalDate;
 
 import java.net.URI;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
@@ -29,7 +33,6 @@ public class MealRestController extends AbstractMealController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Meal> createWithLocation(@RequestBody Meal meal) {
-        //log.info("create {}", user);
         checkNew(meal);
         Meal created = super.create(meal);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -58,13 +61,17 @@ public class MealRestController extends AbstractMealController {
         return super.getAll();
     }
 
-    //@Override : it is not override, so it is necessary in the task
+    @Override
     @GetMapping(value = "/by")
     public List<MealTo> getBetween(
-            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam("startTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
-            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-            @RequestParam("endTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
-        return super.getBetween(startDate.toLocalDate(), startTime.toLocalTime(), endDate.toLocalDate(), endTime.toLocalTime());
+            @RequestParam("startDate") LocalDate startDate,
+            @RequestParam("startTime") LocalTime startTime,
+            @RequestParam("endDate") LocalDate endDate,
+            @RequestParam("endTime") LocalTime endTime) {
+        return super.getBetween(
+                DateTimeUtil.adjustStartDateTime(startDate).toLocalDate(),
+                startTime == null ? LocalTime.MIN : startTime,
+                DateTimeUtil.adjustEndDateTime(endDate).toLocalDate(),
+                endTime == null ? LocalTime.MAX : endTime);
     }
 }

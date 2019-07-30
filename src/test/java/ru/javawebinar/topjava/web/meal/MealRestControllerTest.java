@@ -93,10 +93,10 @@ class MealRestControllerTest extends AbstractControllerTest {
         SecurityUtil.setAuthUserId(USER_ID);
         mockMvc.perform(get(REST_URL + "by?"
                         + "startDate={startDate}&endDate={endDate}&startTime={startTime}&endTime={endTime}",
-                DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(localDateTime),
-                DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(localDateTime),
-                DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(localDateTime),
-                DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(localDateTime)))
+                DateTimeFormatter.ISO_LOCAL_DATE.format(localDateTime),
+                DateTimeFormatter.ISO_LOCAL_DATE.format(localDateTime),
+                DateTimeFormatter.ISO_LOCAL_TIME.format(localDateTime),
+                DateTimeFormatter.ISO_LOCAL_TIME.format(localDateTime)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(MealTestData.contentJsonTo(MealsUtil.getWithExcess(Collections.singletonList(MEAL3),
