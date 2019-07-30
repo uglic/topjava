@@ -40,7 +40,7 @@ class RootControllerTest extends AbstractControllerTest {
 
     @Test
     void testMeals() throws Exception {
-        List<MealTo> expected = MealsUtil.getWithExcess(MEALS, MealsUtil.DEFAULT_CALORIES_PER_DAY);
+        List<MealTo> expected = MealsUtil.getWithExcess(MEALS, USER.getCaloriesPerDay());
         mockMvc.perform(get("/meals"))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -60,13 +60,8 @@ class RootControllerTest extends AbstractControllerTest {
                         new AssertionMatcher<List<MealTo>>() {
                             @Override
                             public void assertion(List<MealTo> actual) throws AssertionError {
-                                MealTestData.assertMatch(actual.stream()
-                                        .map(mt -> new Meal(mt.getId(),
-                                                mt.getDateTime(),
-                                                mt.getDescription(),
-                                                mt.getCalories()))
-                                        .collect(Collectors.toList()), MEALS
-                                );
+                                MealTestData.assertMatchTo(actual,
+                                        MealsUtil.getWithExcess(MEALS, USER.getCaloriesPerDay()));
                             }
                         }
                 ));

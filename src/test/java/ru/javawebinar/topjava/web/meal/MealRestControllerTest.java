@@ -5,16 +5,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import ru.javawebinar.topjava.MealTestData;
+import ru.javawebinar.topjava.model.AbstractBaseEntity;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.MealService;
+import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.SecurityUtil;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -84,22 +89,72 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(MealTestData.contentJsonTo(MealsUtil.getWithExcess(MEALS,
-                        MealsUtil.DEFAULT_CALORIES_PER_DAY)));
+                        USER.getCaloriesPerDay())));
     }
 
     @Test
     void testGetBetween() throws Exception {
-        LocalDateTime localDateTime = MEAL3.getDateTime();
         SecurityUtil.setAuthUserId(USER_ID);
         mockMvc.perform(get(REST_URL + "by?"
                         + "startDate={startDate}&endDate={endDate}&startTime={startTime}&endTime={endTime}",
-                DateTimeFormatter.ISO_LOCAL_DATE.format(localDateTime),
-                DateTimeFormatter.ISO_LOCAL_DATE.format(localDateTime),
-                DateTimeFormatter.ISO_LOCAL_TIME.format(localDateTime),
-                DateTimeFormatter.ISO_LOCAL_TIME.format(localDateTime)))
+                "2015-05-30", "2015-05-30", "20:00", "20:00"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(MealTestData.contentJsonTo(MealsUtil.getWithExcess(Collections.singletonList(MEAL3),
-                        MealsUtil.DEFAULT_CALORIES_PER_DAY)));
+                        USER.getCaloriesPerDay())));
+    }
+
+    @Test
+    void testGetBetweenEmptyStartDate() throws Exception {
+        SecurityUtil.setAuthUserId(USER_ID);
+        mockMvc.perform(get(REST_URL + "by?"
+                        + "startDate={startDate}&endDate={endDate}&startTime={startTime}&endTime={endTime}",
+                "", "2015-05-31", "20:00", "20:00"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(MealTestData.contentJsonTo(getFilteredMealTo(USER, MEAL6, MEAL3)));
+    }
+
+    @Test
+    void testGetBetweenEmptyEndDate() throws Exception {
+        SecurityUtil.setAuthUserId(USER_ID);
+        mockMvc.perform(get(REST_URL + "by?"
+                        + "startDate={startDate}&endDate={endDate}&startTime={startTime}&endTime={endTime}",
+                "2015-05-30", "", "13:00", "20:00"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(MealTestData.contentJsonTo(getFilteredMealTo(USER, MEAL6, MEAL5, MEAL3, MEAL2)));
+    }
+
+    @Test
+    void testGetBetweenEmptyStartTime() throws Exception {
+        SecurityUtil.setAuthUserId(USER_ID);
+        mockMvc.perform(get(REST_URL + "by?"
+                        + "startDate={startDate}&endDate={endDate}&startTime={startTime}&endTime={endTime}",
+                "2015-05-30", "2015-05-30", "", "13:00"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(MealTestData.contentJsonTo(getFilteredMealTo(USER, MEAL2, MEAL1)));
+    }
+
+    @Test
+    void testGetBetweenEmptyEndTime() throws Exception {
+        SecurityUtil.setAuthUserId(USER_ID);
+        mockMvc.perform(get(REST_URL + "by?"
+                        + "startDate={startDate}&endDate={endDate}&startTime={startTime}&endTime={endTime}",
+                "2015-05-30", "2015-05-31", "20:00", ""))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(MealTestData.contentJsonTo(getFilteredMealTo(USER, MEAL6, MEAL3)));
+    }
+
+    private List<MealTo> getFilteredMealTo(User user, Meal... meals) {
+        return MealsUtil.getWithExcess(MEALS,
+                user.getCaloriesPerDay()).stream()
+                .filter(m -> Arrays.stream(meals)
+                        .map(AbstractBaseEntity::getId)
+                        .collect(Collectors.toList())
+                        .contains(m.getId()))
+                .collect(Collectors.toList());
     }
 }

@@ -33,7 +33,6 @@ public class MealRestController extends AbstractMealController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Meal> createWithLocation(@RequestBody Meal meal) {
-        checkNew(meal);
         Meal created = super.create(meal);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL + "/{id}")
@@ -68,10 +67,6 @@ public class MealRestController extends AbstractMealController {
             @RequestParam("startTime") LocalTime startTime,
             @RequestParam("endDate") LocalDate endDate,
             @RequestParam("endTime") LocalTime endTime) {
-        return super.getBetween(
-                DateTimeUtil.adjustStartDateTime(startDate).toLocalDate(),
-                startTime == null ? LocalTime.MIN : startTime,
-                DateTimeUtil.adjustEndDateTime(endDate).toLocalDate(),
-                endTime == null ? LocalTime.MAX : endTime);
+        return super.getBetween(startDate, startTime, endDate, endTime);
     }
 }
