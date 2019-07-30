@@ -7,6 +7,7 @@ import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.to.MealTo;
+import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,6 +40,17 @@ class RootControllerTest extends AbstractControllerTest {
 
     @Test
     void testMeals() throws Exception {
+        List<MealTo> expected = MealsUtil.getWithExcess(MEALS, MealsUtil.DEFAULT_CALORIES_PER_DAY);
+        mockMvc.perform(get("/meals"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(view().name("meals"))
+                .andExpect(forwardedUrl("/WEB-INF/jsp/meals.jsp"))
+                .andExpect(model().attribute("meals", expected));
+    }
+
+    @Test
+    void testMealsWithMatcher() throws Exception {
         mockMvc.perform(get("/meals"))
                 .andDo(print())
                 .andExpect(status().isOk())
