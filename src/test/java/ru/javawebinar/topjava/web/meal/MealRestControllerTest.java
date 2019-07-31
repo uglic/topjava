@@ -148,6 +148,50 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(MealTestData.contentJsonTo(getFilteredMealTo(USER, MEAL6, MEAL3)));
     }
 
+    @Test
+    void testGetBetweenNullStartDate() throws Exception {
+        SecurityUtil.setAuthUserId(USER_ID);
+        mockMvc.perform(get(REST_URL + "by?"
+                        + "endDate={endDate}&startTime={startTime}&endTime={endTime}",
+                "2015-05-31", "20:00", "20:00"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(MealTestData.contentJsonTo(getFilteredMealTo(USER, MEAL6, MEAL3)));
+    }
+
+    @Test
+    void testGetBetweenNullEndDate() throws Exception {
+        SecurityUtil.setAuthUserId(USER_ID);
+        mockMvc.perform(get(REST_URL + "by?"
+                        + "startDate={startDate}&startTime={startTime}&endTime={endTime}",
+                "2015-05-30", "13:00", "20:00"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(MealTestData.contentJsonTo(getFilteredMealTo(USER, MEAL6, MEAL5, MEAL3, MEAL2)));
+    }
+
+    @Test
+    void testGetBetweenNullStartTime() throws Exception {
+        SecurityUtil.setAuthUserId(USER_ID);
+        mockMvc.perform(get(REST_URL + "by?"
+                        + "startDate={startDate}&endDate={endDate}&endTime={endTime}",
+                "2015-05-30", "2015-05-30", "13:00"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(MealTestData.contentJsonTo(getFilteredMealTo(USER, MEAL2, MEAL1)));
+    }
+
+    @Test
+    void testGetBetweenNullEndTime() throws Exception {
+        SecurityUtil.setAuthUserId(USER_ID);
+        mockMvc.perform(get(REST_URL + "by?"
+                        + "startDate={startDate}&endDate={endDate}&startTime={startTime}",
+                "2015-05-30", "2015-05-31", "20:00"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(MealTestData.contentJsonTo(getFilteredMealTo(USER, MEAL6, MEAL3)));
+    }
+
     private List<MealTo> getFilteredMealTo(User user, Meal... meals) {
         return MealsUtil.getWithExcess(MEALS,
                 user.getCaloriesPerDay()).stream()
