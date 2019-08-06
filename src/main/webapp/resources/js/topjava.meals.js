@@ -2,6 +2,7 @@
 $(function () {
     makeEditable({
             ajaxUrl: "ajax/meals/",
+            restUrl: "rest/profile/meals/",
             datatableApi: $("#datatable").DataTable({
                 "paging": false,
                 "info": true,
@@ -30,7 +31,23 @@ $(function () {
                         "asc"
                     ]
                 ]
-            })
+            }),
+            applyFilter: applyFilter
         }
     );
+    initFilter();
 });
+
+function initFilter() {
+    $("#filterForm").submit(function (e) {
+        e.preventDefault();
+    });
+    $("#filterForm > button, input[type='submit']")
+        .click(applyFilter);
+}
+
+function applyFilter() {
+    $.get(context.restUrl + "filter?" + $("#filterForm").serialize(), function (data) {
+        context.datatableApi.clear().rows.add(data).draw();
+    });
+}
