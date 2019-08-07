@@ -30,7 +30,8 @@ $(function () {
                         "desc"
                     ]
                 ]
-            })
+            }),
+            filter: $("#filterForm")
         }
     );
 });

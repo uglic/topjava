@@ -54,6 +54,11 @@ public class UserService {
         checkNotFoundWithId(repository.save(user), user.getId());
     }
 
+    @CacheEvict(value = "users", allEntries = true)
+    public void updateEnable(int userId, boolean enable) {
+        checkNotFoundWithId(repository.updateEnable(userId, enable), userId);
+    }
+
     public User getWithMeals(int id) {
         return checkNotFoundWithId(repository.getWithMeals(id), id);
     }
