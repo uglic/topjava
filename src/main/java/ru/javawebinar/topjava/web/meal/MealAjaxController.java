@@ -42,7 +42,7 @@ public class MealAjaxController extends AbstractMealController {
     }
 
     @Override
-    @GetMapping(value = "/filter")
+    @GetMapping(value = "/filter", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<MealTo> getBetween(
             @RequestParam(required = false) LocalDate startDate,
             @RequestParam(required = false) LocalTime startTime,

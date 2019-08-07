@@ -15,7 +15,6 @@ function makeEditable(ctx) {
 
     // solve problem with cache in IE: https://stackoverflow.com/a/4303862/548473
     $.ajaxSetup({cache: false});
-    if (ctx.filter !== undefined) initFilter(ctx);
 }
 
 function add() {
@@ -28,7 +27,7 @@ function deleteRow(id) {
         url: context.ajaxUrl + id,
         type: "DELETE"
     }).done(function () {
-        applyFilter(context);
+        if (context.onAfterDeleteCallback !== undefined) context.onAfterDeleteCallback();
         successNoty("Deleted");
     });
 }
@@ -40,31 +39,13 @@ function save() {
         data: form.serialize()
     }).done(function () {
         $("#editRow").modal("hide");
-        applyFilter(context);
+        if (context.onAfterSaveCallback !== undefined) context.onAfterSaveCallback();
         successNoty("Saved");
     });
 }
 
-function applyFilter(ctx) {
-    let query = ctx.ajaxUrl;
-    if (ctx.filter !== undefined) {
-        query = ctx.ajaxUrl + "filter?" + ctx.filter.serialize();
-    }
-    $.get(query, updateData);
-}
-
-
 function updateData(data) {
     context.datatableApi.clear().rows.add(data).draw();
-}
-
-function initFilter(ctx) {
-    ctx.filter.submit((e) => e.preventDefault());
-    ctx.filter.children("button[type='submit'], button[type='reset']").click(function (e) {
-            if ($(this).attr("type") === "reset") $(this).closest("form")[0].reset();
-            applyFilter(ctx);
-        }
-    );
 }
 
 let failedNote;

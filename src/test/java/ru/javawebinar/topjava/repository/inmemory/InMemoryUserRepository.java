@@ -38,4 +38,10 @@ public class InMemoryUserRepository extends InMemoryBaseRepository<User> impleme
                 .findFirst()
                 .orElse(null);
     }
+
+    @Override
+    public boolean updateEnable(int userId, boolean enable) {
+        entryMap.get(userId).setEnabled(enable);
+        return true;
+    }
 }

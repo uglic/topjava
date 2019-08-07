@@ -36,7 +36,9 @@ $(function () {
                         "asc"
                     ]
                 ]
-            })
+            }),
+            onAfterDeleteCallback: updateUsers,
+            onAfterSaveCallback: updateUsers
         }
     );
     initUserHandlers();
@@ -54,6 +56,8 @@ function initUserHandlers() {
                 url: context.ajaxUrl + id + "/enable",
                 data: "enabled=" + check.checked
             }).done(function () {
+                let username = $(row).children("td[id^='name.']")[0].innerText;
+                successNoty("User [" + username + "] " + (check.checked ? "enabled" : "disabled"));
             }).fail(function () {
                 $(check).prop("checked", !check.checked);
             }).always(function () {
@@ -66,17 +70,11 @@ function initUserHandlers() {
         });
 }
 
-function setUserEnabled(id, newStatus) {
-    $.ajax({
-        type: "POST",
-        url: context.ajaxUrl + id + "/enable",
-        data: newStatus
-    }).done(function () {
-        applyFilter(context);
-    });
-}
-
 function updateUserTableStyles() {
     $("#datatable tr[data-userEnabled='false']").addClass("table-warning");
     $("#datatable tr[data-userEnabled='true']").removeClass("table-warning");
+}
+
+function updateUsers() {
+    $.get(context.ajaxUrl, updateData);
 }

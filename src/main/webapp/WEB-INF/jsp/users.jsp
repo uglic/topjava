@@ -32,7 +32,7 @@
             <c:forEach items="${users}" var="user">
                 <jsp:useBean id="user" type="ru.javawebinar.topjava.model.User"/>
                 <tr id="${user.id}" data-userEnabled="${user.enabled}">
-                    <td><c:out value="${user.name}"/></td>
+                    <td id="name.${user.id}"><c:out value="${user.name}"/></td>
                     <td><a href="mailto:${user.email}">${user.email}</a></td>
                     <td>${user.roles}</td>
                     <td><input type="checkbox" <c:if test="${user.enabled}">checked</c:if> id="enabled.${user.id}"/></td>
