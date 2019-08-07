@@ -45,7 +45,7 @@ function initMealsFilter() { // global namespace so -meals-
     filterMeals.submit((e) => e.preventDefault());
     filterMeals.children("button[type='submit'], button[type='reset']").click(function (e) {
             if ($(this).attr("type") === "reset") $(this).closest("form")[0].reset();
-            applyFilter();
+            applyMealsFilter();
         }
     );
 }
