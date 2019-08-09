@@ -24,6 +24,7 @@
     <!--<logger name="org.springframework.web.servlet" level="debug"/>-->
     <logger name="org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver" level="debug"/>
     <logger name="org.springframework.security" level="debug"/>
+    <Logger name="org.hibernate.type" level="trace" />
 
     <root level="info">
         <appender-ref ref="file"/>

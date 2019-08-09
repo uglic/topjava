@@ -1,12 +1,15 @@
 package ru.javawebinar.topjava.repository.datajpa;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class DataJpaUserRepository implements UserRepository {
@@ -22,7 +25,12 @@ public class DataJpaUserRepository implements UserRepository {
 
     @Override
     public boolean delete(int id) {
-        return crudRepository.delete(id) != 0;
+        try {
+            crudRepository.deleteById(id);
+            return true;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
     }
 
     @Override
@@ -46,7 +54,13 @@ public class DataJpaUserRepository implements UserRepository {
     }
 
     @Override
+    @Transactional
     public boolean updateEnable(int userId, boolean enable) {
-        return crudRepository.updateEnable(userId, enable) != 0;
+        Optional<User> userOptional = crudRepository.getByIdFieldsOnly(userId);
+        if (userOptional.isPresent()) {
+            userOptional.get().setEnabled(enable);
+            return true;
+        }
+        return false;
     }
 }
