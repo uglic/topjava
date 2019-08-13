@@ -5,15 +5,18 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.to.MealToIn;
+import ru.javawebinar.topjava.to.MealsFilterTo;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.StringJoiner;
+
+import static ru.javawebinar.topjava.util.ValidationUtil.parseValidationErrors;
 
 @RestController
 @RequestMapping("/ajax/profile/meals")
@@ -26,6 +29,12 @@ public class MealUIController extends AbstractMealController {
     }
 
     @Override
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Meal get(@PathVariable("id") int id) {
+        return super.get(id);
+    }
+
+    @Override
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void delete(@PathVariable int id) {
@@ -35,18 +44,7 @@ public class MealUIController extends AbstractMealController {
     @PostMapping
     public ResponseEntity<String> createOrUpdate(@Valid MealToIn mealToIn, BindingResult result) {
         if (result.hasErrors()) {
-            StringJoiner joiner = new StringJoiner("<br>");
-            result.getFieldErrors().forEach(
-                    fe -> {
-                        String msg = fe.getDefaultMessage();
-                        if (msg != null) {
-                            if (!msg.startsWith(fe.getField())) {
-                                msg = fe.getField() + ' ' + msg;
-                            }
-                            joiner.add(msg);
-                        }
-                    });
-            return ResponseEntity.unprocessableEntity().body(joiner.toString());
+            return parseValidationErrors(result);
         }
         if (mealToIn.isNew()) {
             super.create(MealsUtil.createNewFromTo(mealToIn));
@@ -56,13 +54,12 @@ public class MealUIController extends AbstractMealController {
         return ResponseEntity.ok().build();
     }
 
-    @Override
+    //@Override
     @GetMapping(value = "/filter", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<MealTo> getBetween(
-            @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalTime startTime,
-            @RequestParam(required = false) LocalDate endDate,
-            @RequestParam(required = false) LocalTime endTime) {
-        return super.getBetween(startDate, startTime, endDate, endTime);
+    public List<MealTo> getBetween(MealsFilterTo mealsFilterTo) {
+        return super.getBetween(mealsFilterTo.getStartDate(),
+                mealsFilterTo.getStartTime(),
+                mealsFilterTo.getEndDate(),
+                mealsFilterTo.getEndTime());
     }
 }
