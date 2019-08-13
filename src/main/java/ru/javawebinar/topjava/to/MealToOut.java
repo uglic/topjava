@@ -1,37 +1,28 @@
 package ru.javawebinar.topjava.to;
 
-import org.hibernate.validator.constraints.Range;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-public class MealToIn extends BaseTo implements Serializable {
+public class MealToOut extends BaseTo implements Serializable {
     private static final long serialVersionUID = 1L;
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    @NotNull
-    private LocalDateTimeTo dateTime;
-
-    @NotBlank
-    @Size(min = 2, max = 120)
+    private String dateTime;
     private String description;
-
-    @Range(min = 10, max = 5000)
     private int calories;
 
-    public MealToIn() {
+    public MealToOut() {
     }
 
-    public MealToIn(Integer id, LocalDateTime dateTime, String description, int calories) {
+    public MealToOut(Integer id, LocalDateTime dateTime, String description, int calories) {
         super(id);
-        this.dateTime = new LocalDateTimeTo(dateTime);
+        this.dateTime = DATE_TIME_FORMATTER.format(dateTime);
         this.description = description;
         this.calories = calories;
     }
 
-    public LocalDateTimeTo getDateTime() {
+    public String getDateTime() {
         return dateTime;
     }
 
@@ -43,7 +34,7 @@ public class MealToIn extends BaseTo implements Serializable {
         return calories;
     }
 
-    public void setDateTime(LocalDateTimeTo dateTimeTo) {
+    public void setDateTime(String dateTimeTo) {
         this.dateTime = dateTimeTo;
     }
 

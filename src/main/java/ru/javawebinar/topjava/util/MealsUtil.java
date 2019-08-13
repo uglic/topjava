@@ -6,6 +6,7 @@ import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.to.MealToIn;
+import ru.javawebinar.topjava.to.MealToOut;
 import ru.javawebinar.topjava.to.UserTo;
 
 import java.time.LocalDate;
@@ -50,7 +51,7 @@ public class MealsUtil {
     }
 
     public static Meal createNewFromTo(MealToIn mealToIn) {
-        return new Meal(null, mealToIn.getDateTime(), mealToIn.getDescription(), mealToIn.getCalories());
+        return new Meal(null, mealToIn.getDateTime().getDateTime(), mealToIn.getDescription(), mealToIn.getCalories());
     }
 
     public static MealToIn asTo(Meal meal) {
@@ -58,9 +59,13 @@ public class MealsUtil {
     }
 
     public static Meal updateFromTo(Meal meal, MealToIn mealToIn) {
-        meal.setDateTime(mealToIn.getDateTime());
+        meal.setDateTime(mealToIn.getDateTime().getDateTime());
         meal.setDescription(mealToIn.getDescription());
         meal.setCalories(mealToIn.getCalories());
         return meal;
+    }
+
+    public static MealToOut asToOut(Meal meal) {
+        return new MealToOut(meal.getId(), meal.getDateTime(), meal.getDescription(), meal.getCalories());
     }
 }
