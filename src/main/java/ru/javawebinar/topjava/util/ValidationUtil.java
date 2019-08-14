@@ -3,9 +3,11 @@ package ru.javawebinar.topjava.util;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import ru.javawebinar.topjava.HasId;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import java.util.List;
 import java.util.StringJoiner;
 
 public class ValidationUtil {

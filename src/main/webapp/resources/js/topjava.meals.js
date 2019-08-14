@@ -61,7 +61,8 @@ $(function () {
             }
         }),
         updateTable: updateFilteredTable,
-        renderValueForKey: renderValueForKey
+        renderValueForKey: renderValueForKey,
+        beforeSerialization: beforeSerialization
     });
     setDateTimePickers();
 });
@@ -112,5 +113,14 @@ function renderValueForKey(key, value) {
             return renderDateInput(value);
         default:
             return value
+    }
+}
+
+function beforeSerialization(item) {
+    switch (item.name) {
+        case "dateTime":
+            item.value = item.value.substr(0, 16).replace(" ", "T");
+            break;
+        default:
     }
 }

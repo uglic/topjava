@@ -50,7 +50,7 @@ function save() {
     $.ajax({
         type: "POST",
         url: context.ajaxUrl,
-        data: form.serialize()
+        data: getSerialized()
     }).done(function () {
         $("#editRow").modal("hide");
         context.updateTable();
@@ -95,5 +95,15 @@ function renderEditBtn(data, type, row) {
 function renderDeleteBtn(data, type, row) {
     if (type === "display") {
         return "<a onclick='deleteRow(" + row.id + ");'><span class='fa fa-remove'></span></a>";
+    }
+}
+
+function getSerialized() {
+    if (context.beforeSerialization !== undefined) {
+        let data = form.serializeArray();
+        data.forEach(context.beforeSerialization);
+        return $.param(data);
+    } else {
+        return form.serialize();
     }
 }

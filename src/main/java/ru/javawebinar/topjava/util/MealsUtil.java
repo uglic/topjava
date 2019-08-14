@@ -2,12 +2,7 @@ package ru.javawebinar.topjava.util;
 
 import org.springframework.lang.Nullable;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.model.Role;
-import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.to.MealTo;
-import ru.javawebinar.topjava.to.MealToIn;
-import ru.javawebinar.topjava.to.MealToOut;
-import ru.javawebinar.topjava.to.UserTo;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -17,7 +12,6 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.reducing;
 import static java.util.stream.Collectors.toList;
 
 public class MealsUtil {
@@ -48,24 +42,5 @@ public class MealsUtil {
 
     public static MealTo createWithExcess(Meal meal, boolean excess) {
         return new MealTo(meal.getId(), meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
-    }
-
-    public static Meal createNewFromTo(MealToIn mealToIn) {
-        return new Meal(null, mealToIn.getDateTime().getDateTime(), mealToIn.getDescription(), mealToIn.getCalories());
-    }
-
-    public static MealToIn asTo(Meal meal) {
-        return new MealToIn(meal.getId(), meal.getDateTime(), meal.getDescription(), meal.getCalories());
-    }
-
-    public static Meal updateFromTo(Meal meal, MealToIn mealToIn) {
-        meal.setDateTime(mealToIn.getDateTime().getDateTime());
-        meal.setDescription(mealToIn.getDescription());
-        meal.setCalories(mealToIn.getCalories());
-        return meal;
-    }
-
-    public static MealToOut asToOut(Meal meal) {
-        return new MealToOut(meal.getId(), meal.getDateTime(), meal.getDescription(), meal.getCalories());
     }
 }
