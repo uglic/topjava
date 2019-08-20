@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.web.meal;
 
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -124,5 +123,125 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .with(userHttpBasic(USER)))
                 .andExpect(status().isOk())
                 .andExpect(contentJson(getWithExcess(MEALS, USER.getCaloriesPerDay())));
+    }
+
+    // ------- update validation
+
+    @Test
+    void updateInvalidDateNull() throws Exception {
+        Meal updated = getUpdated();
+        updated.setDateTime(null);
+        updateInvalid(updated);
+    }
+
+    @Test
+    void updateInvalidDescriptionNull() throws Exception {
+        Meal updated = getUpdated();
+        updated.setDescription(null);
+        updateInvalid(updated);
+    }
+
+    @Test
+    void updateInvalidDescriptionBlank() throws Exception {
+        Meal updated = getUpdated();
+        updated.setDescription(" \t\n\r");
+        updateInvalid(updated);
+    }
+
+    @Test
+    void updateInvalidDescriptionShort() throws Exception {
+        Meal updated = getUpdated();
+        updated.setDescription("s");
+        updateInvalid(updated);
+    }
+
+    @Test
+    void updateInvalidDescriptionLong() throws Exception {
+        Meal updated = getUpdated();
+        updated.setDescription(new String(new char[121]).replace('\0', 's'));
+        updateInvalid(updated);
+    }
+
+    @Test
+    void updateInvalidCaloriesLow() throws Exception {
+        Meal updated = getUpdated();
+        updated.setCalories(9);
+        updateInvalid(updated);
+    }
+
+    @Test
+    void updateInvalidCaloriesHigh() throws Exception {
+        Meal updated = getUpdated();
+        updated.setCalories(5001);
+        updateInvalid(updated);
+    }
+
+    // create validation
+
+    @Test
+    void createWithLocationInvalidDateNull() throws Exception {
+        Meal created = getCreated();
+        created.setDateTime(null);
+        createWithLocationInvalid(created);
+    }
+
+    @Test
+    void createWithLocationInvalidDescriptionNull() throws Exception {
+        Meal created = getCreated();
+        created.setDescription(null);
+        createWithLocationInvalid(created);
+    }
+
+    @Test
+    void createWithLocationInvalidDescriptionBlank() throws Exception {
+        Meal created = getCreated();
+        created.setDescription(" \t\n\r");
+        createWithLocationInvalid(created);
+    }
+
+    @Test
+    void createWithLocationInvalidDescriptionShort() throws Exception {
+        Meal created = getCreated();
+        created.setDescription("s");
+        createWithLocationInvalid(created);
+    }
+
+    @Test
+    void createWithLocationInvalidDescriptionLong() throws Exception {
+        Meal created = getCreated();
+        created.setDescription(new String(new char[121]).replace('\0', 's'));
+        createWithLocationInvalid(created);
+    }
+
+    @Test
+    void createWithLocationInvalidCaloriesLow() throws Exception {
+        Meal created = getCreated();
+        created.setCalories(9);
+        createWithLocationInvalid(created);
+    }
+
+    @Test
+    void createWithLocationInvalidCaloriesHigh() throws Exception {
+        Meal created = getCreated();
+        created.setCalories(5001);
+        createWithLocationInvalid(created);
+    }
+
+    // validation subroutine
+
+    private void updateInvalid(Meal testMeal) throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put(REST_URL + MEAL1_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(testMeal))
+                .with(userHttpBasic(USER)))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    private void createWithLocationInvalid(Meal testMeal) throws Exception {
+        ResultActions action = mockMvc.perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(testMeal))
+                .with(userHttpBasic(ADMIN)))
+                .andExpect(status().isUnprocessableEntity());
     }
 }
