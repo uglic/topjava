@@ -238,7 +238,7 @@ class MealRestControllerTest extends AbstractControllerTest {
     }
 
     private void createWithLocationInvalid(Meal testMeal) throws Exception {
-        ResultActions action = mockMvc.perform(MockMvcRequestBuilders.post(REST_URL)
+        mockMvc.perform(MockMvcRequestBuilders.post(REST_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(testMeal))
                 .with(userHttpBasic(ADMIN)))
