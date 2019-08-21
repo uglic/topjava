@@ -53,9 +53,4 @@ public class ProfileUIController extends AbstractUserController {
             return "redirect:/login?message=app.registered&username=" + userTo.getEmail();
         }
     }
-
-    @InitBinder
-    protected void initBinder(WebDataBinder binder) {
-        super.initBinder(binder);
-    }
 }

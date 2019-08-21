@@ -7,6 +7,7 @@ import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.validation.*;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 
@@ -73,6 +74,21 @@ public class ValidationUtil {
                     }
                 });
         return ResponseEntity.unprocessableEntity().body(joiner.toString());
+    }
+
+    public static Set<String> getErrorResponseAsSet(BindingResult result) {
+        Set<String> joiner = new LinkedHashSet();
+        result.getFieldErrors().forEach(
+                fe -> {
+                    String msg = fe.getDefaultMessage();
+                    if (msg != null) {
+                        if (!msg.startsWith(fe.getField())) {
+                            msg = fe.getField() + ' ' + msg;
+                        }
+                        joiner.add(msg);
+                    }
+                });
+        return joiner;
     }
 
     private static final Validator validator;

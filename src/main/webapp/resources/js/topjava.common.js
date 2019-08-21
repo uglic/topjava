@@ -96,8 +96,16 @@ function successNoty(key) {
 function failNoty(jqXHR) {
     closeNoty();
     const errorInfo = JSON.parse(jqXHR.responseText);
+    let errors = "";
+    if (errorInfo[0] === undefined) {
+        errors = "<br>" + errorInfo.type + "<br>" + errorInfo.detail;
+    } else {
+        errorInfo.forEach(function (e) {
+            errors += "<br>" + e.type + "<br>" + e.detail;
+        });
+    }
     failedNote = new Noty({
-        text: "<span class='fa fa-lg fa-exclamation-circle'></span> &nbsp;" + i18n["common.errorStatus"] + ": " + jqXHR.status + "<br>" + errorInfo.type + "<br>" + errorInfo.detail,
+        text: "<span class='fa fa-lg fa-exclamation-circle'></span> &nbsp;" + i18n["common.errorStatus"] + ": " + jqXHR.status + "<br>" + errors,
         type: "error",
         layout: "bottomRight"
     }).show();

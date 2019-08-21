@@ -23,11 +23,6 @@ public class AdminRestController extends AbstractUserController {
 
     public static final String REST_URL = "/rest/admin/users";
 
-    @InitBinder
-    protected void initBinder(WebDataBinder binder) {
-        super.initBinder(binder);
-    }
-
     @Override
     @GetMapping
     public List<User> getAll() {
@@ -41,10 +36,7 @@ public class AdminRestController extends AbstractUserController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> createWithLocation(@RequestBody @Valid User user, BindingResult result) {
-        if (result.hasErrors()) {
-            throw new IllegalRequestDataException(ValidationUtil.getErrorResponse(result).getBody());
-        }
+    public ResponseEntity<User> createWithLocation(@RequestBody @Valid User user) {
         User created = super.create(user);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL + "/{id}")
@@ -62,10 +54,7 @@ public class AdminRestController extends AbstractUserController {
     //@Override
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void update(@RequestBody @Valid User user, @PathVariable int id, BindingResult result) {
-        if (result.hasErrors()) {
-            throw new IllegalRequestDataException(ValidationUtil.getErrorResponse(result).getBody());
-        }
+    public void update(@RequestBody @Valid User user, @PathVariable int id) {
         super.update(user, id);
     }
 

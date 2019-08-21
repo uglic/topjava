@@ -3,7 +3,6 @@ package ru.javawebinar.topjava.web.user;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import ru.javawebinar.topjava.model.User;
@@ -13,7 +12,6 @@ import ru.javawebinar.topjava.util.UserUtil;
 import ru.javawebinar.topjava.web.validator.SpringHibernateValidatorAdapter;
 import ru.javawebinar.topjava.web.validator.UserValidator;
 
-import javax.validation.Validation;
 import java.util.List;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
@@ -73,7 +71,9 @@ public abstract class AbstractUserController {
         service.enable(id, enabled);
     }
 
+    @InitBinder
     protected void initBinder(WebDataBinder binder) {
-        binder.addValidators(hibernateValidator, userValidator);
+        //binder.addValidators(hibernateValidator, userValidator);
+        binder.addValidators(userValidator);
     }
 }
