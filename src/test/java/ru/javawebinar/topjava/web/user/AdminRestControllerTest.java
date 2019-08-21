@@ -195,15 +195,10 @@ class AdminRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     void updateInvalidEmailNotUnique() throws Exception {
         User updated = new User(USER);
         updated.setEmail(ADMIN.getEmail());
-        mockMvc.perform(MockMvcRequestBuilders.put(REST_URL + USER_ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(userHttpBasic(ADMIN))
-                .content(UserTestData.jsonWithPassword(updated, USER.getPassword()))) //.content(JsonUtil.writeValue(updated)))
-                .andExpect(status().isConflict());
+        updateInvalid(updated);
     }
 
     @Test
@@ -288,7 +283,9 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
     @Test
     void createWithLocationInvalidEmailLong() throws Exception {
-        User expected = new User(null, "New", new String(new char[101]).replace('\0', 'v'), "newPass", 2300, Role.ROLE_USER, Role.ROLE_ADMIN);
+        User expected = new User(null, "New",
+                "name@" + new String(new char[96]).replace('\0', 'v'),
+                "newPass", 2300, Role.ROLE_USER, Role.ROLE_ADMIN);
         createWithLocationInvalid(expected);
     }
 
@@ -299,14 +296,10 @@ class AdminRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    //@Transactional(propagation = Propagation.NOT_SUPPORTED)
     void createWithLocationInvalidEmailNotUnique() throws Exception {
         User expected = new User(null, "New", USER.getEmail(), "newPass", 2300, Role.ROLE_USER, Role.ROLE_ADMIN);
-        mockMvc.perform(MockMvcRequestBuilders.post(REST_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(userHttpBasic(ADMIN))
-                .content(jsonWithPassword(expected, expected.getPassword())))
-                .andExpect(status().isConflict());
+        createWithLocationInvalid(expected);
     }
 
     @Test
@@ -356,7 +349,6 @@ class AdminRestControllerTest extends AbstractControllerTest {
     }
 
     void createWithLocationInvalid(User testUser) throws Exception {
-        //User expected = new User(null, "New", "new@gmail.com", "newPass",  2300, Role.ROLE_USER, Role.ROLE_ADMIN);
         mockMvc.perform(MockMvcRequestBuilders.post(REST_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(ADMIN))

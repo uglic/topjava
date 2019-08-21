@@ -4,11 +4,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.util.ValidationUtil;
 import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
+import ru.javawebinar.topjava.web.validator.UserValidator;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -19,6 +22,11 @@ import java.util.List;
 public class AdminRestController extends AbstractUserController {
 
     public static final String REST_URL = "/rest/admin/users";
+
+    @InitBinder
+    protected void initBinder(WebDataBinder binder) {
+        super.initBinder(binder);
+    }
 
     @Override
     @GetMapping
