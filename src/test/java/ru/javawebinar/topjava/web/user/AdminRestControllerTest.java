@@ -12,11 +12,9 @@ import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -296,9 +294,8 @@ class AdminRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    //@Transactional(propagation = Propagation.NOT_SUPPORTED)
     void createWithLocationInvalidEmailNotUnique() throws Exception {
-        User expected = new User(null, "New", USER.getEmail(), "newPass", 2300, Role.ROLE_USER, Role.ROLE_ADMIN);
+        User expected = new User(null, "New", ADMIN.getEmail(), "newPass", 2300, Role.ROLE_USER, Role.ROLE_ADMIN);
         createWithLocationInvalid(expected);
     }
 
@@ -335,6 +332,22 @@ class AdminRestControllerTest extends AbstractControllerTest {
     @Test
     void createWithLocationInvalidCaloriesPerDayHigh() throws Exception {
         User expected = new User(null, "New", "new@gmail.com", "newPass", 10001, Role.ROLE_USER, Role.ROLE_ADMIN);
+        createWithLocationInvalid(expected);
+    }
+
+    // -- transactional check for email unique
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void updateInvalidEmailNotUniqueTransactional() throws Exception {
+        User updated = new User(USER);
+        updated.setEmail(ADMIN.getEmail());
+        updateInvalid(updated);
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void createWithLocationInvalidEmailNotUniqueTransactional() throws Exception {
+        User expected = new User(null, "New", USER.getEmail(), "newPass", 2300, Role.ROLE_USER, Role.ROLE_ADMIN);
         createWithLocationInvalid(expected);
     }
 
