@@ -38,30 +38,30 @@ public class UserValidator implements Validator {
 
     private <T extends HasId> void validateEmail(T user, String email, Errors errors) {
         if (errors.getFieldErrors("email").size() == 0) {
-//            if (email != null) {
-//                try {
-//                    User existing = userService.getByEmail(email);
-//                    if (existing != null) {
-//                        Integer userId;
-//                        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//                        if (auth != null && auth.getAuthorities().iterator().next().getAuthority().equals("ROLE_ANONYMOUS")) {
-//                            userId = null;
-//                        } else {
-//                            userId = (auth == null) ? null : ((AuthorizedUser) auth.getPrincipal()).getUserTo().getId();
-//                        }
-//                        if ((!user.isNew() && !user.getId().equals(existing.getId()))
-//                                ||
-//                                (
-//                                        user.isNew()
-//                                                && ((userId == null) || (!userId.equals(existing.getId())))
-//                                )
-//                        ) {
-//                            errors.rejectValue("email", "user.validation.duplicateEmail", "User with this email already exists");
-//                        }
-//                    }
-//                } catch (NotFoundException ignored) {
-//                }
-//            }
+            if (email != null) {
+                try {
+                    User existing = userService.getByEmail(email);
+                    if (existing != null) {
+                        Integer userId;
+                        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                        if (auth != null && auth.getAuthorities().iterator().next().getAuthority().equals("ROLE_ANONYMOUS")) {
+                            userId = null;
+                        } else {
+                            userId = (auth == null) ? null : ((AuthorizedUser) auth.getPrincipal()).getUserTo().getId();
+                        }
+                        if ((!user.isNew() && !user.getId().equals(existing.getId()))
+                                ||
+                                (
+                                        user.isNew()
+                                                && ((userId == null) || (!userId.equals(existing.getId())))
+                                )
+                        ) {
+                            errors.rejectValue("email", "user.validation.duplicateEmail", "User with this email already exists");
+                        }
+                    }
+                } catch (NotFoundException ignored) {
+                }
+            }
         }
     }
 }
