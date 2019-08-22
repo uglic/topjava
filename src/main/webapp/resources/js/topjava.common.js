@@ -96,12 +96,12 @@ function successNoty(key) {
 function failNoty(jqXHR) {
     closeNoty();
     const errorInfo = JSON.parse(jqXHR.responseText);
-    let errors = "";
-    if (errorInfo[0] === undefined) {
-        errors = "<br>" + errorInfo.type + "<br>" + errorInfo.detail;
+    let errors = "<br>" + errorInfo.type;
+    if (errorInfo.detail[0] === undefined) {
+        errors = "<br>" + errorInfo.detail;
     } else {
-        errorInfo.forEach(function (e) {
-            errors += "<br>" + e.type + "<br>" + e.detail;
+        errorInfo.detail.forEach(function (e) {
+            errors += "<br>" + e;
         });
     }
     failedNote = new Noty({

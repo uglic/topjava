@@ -26,9 +26,6 @@ public abstract class AbstractUserController {
     @Autowired
     UserValidator userValidator;
 
-    @Autowired
-    SpringHibernateValidatorAdapter hibernateValidator;
-
     public List<User> getAll() {
         log.info("getAll");
         return service.getAll();
@@ -72,8 +69,7 @@ public abstract class AbstractUserController {
     }
 
     @InitBinder
-    protected void initBinder(WebDataBinder binder) {
-        //binder.addValidators(hibernateValidator, userValidator);
+    public void initBinder(WebDataBinder binder) {
         binder.addValidators(userValidator);
     }
 }

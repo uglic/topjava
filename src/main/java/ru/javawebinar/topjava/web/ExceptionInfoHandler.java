@@ -8,6 +8,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -22,9 +23,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import java.util.*;
-
-import static ru.javawebinar.topjava.util.ValidationUtil.getErrorResponseAsSet;
+import static ru.javawebinar.topjava.util.ValidationUtil.getErrorResponseAsArray;
 import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 
 @RestControllerAdvice(annotations = RestController.class)
@@ -53,8 +52,8 @@ public class ExceptionInfoHandler {
 
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422
     @ExceptionHandler({BindException.class})
-    public List<ErrorInfo> bindExceptionError(HttpServletRequest req, Exception e) {
-        return logAndGetErrorInfoList(req, e, false, VALIDATION_ERROR);
+    public ErrorInfo bindExceptionError(HttpServletRequest req, Exception e) {
+        return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -71,24 +70,12 @@ public class ExceptionInfoHandler {
         } else {
             log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
         }
-        return new ErrorInfo(req.getRequestURL(), errorType, rootCause.toString());
-    }
-
-    private static List<ErrorInfo> logAndGetErrorInfoList(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
-        if (e instanceof BindException) {
-            Set<String> messages = getErrorResponseAsSet((BindException) e);
-            List<ErrorInfo> errorList = new ArrayList<>();
-            messages.forEach(m -> {
-                if (logException) {
-                    log.error(errorType + " at request " + req.getRequestURL() + ": " + m);
-                } else {
-                    log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), m);
-                }
-                errorList.add(new ErrorInfo(req.getRequestURL(), errorType, m));
-            });
-            return errorList;
+        String[] errorArray;
+        if (e instanceof BindingResult) {
+            errorArray = getErrorResponseAsArray((BindingResult) e);
         } else {
-            return Collections.singletonList(logAndGetErrorInfo(req, e, logException, errorType));
+            errorArray = new String[]{rootCause.toString()};
         }
+        return new ErrorInfo(req.getRequestURL(), errorType, errorArray);
     }
 }

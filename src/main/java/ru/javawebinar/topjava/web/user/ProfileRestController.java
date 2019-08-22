@@ -47,11 +47,6 @@ public class ProfileRestController extends AbstractUserController {
         super.update(userTo, authUserId());
     }
 
-    @InitBinder
-    protected void initBinder(WebDataBinder binder) {
-        super.initBinder(binder);
-    }
-
     @GetMapping(value = "/text")
     public String testUTF() {
         return "Русский текст";
