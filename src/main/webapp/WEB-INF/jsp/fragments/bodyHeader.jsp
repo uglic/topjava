@@ -2,6 +2,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <nav class="navbar navbar-dark bg-dark py-0">
     <div class="container">
@@ -16,6 +18,7 @@
                     <span class="fa fa-sign-out"></span>
                 </button>
             </form:form>
+            <c:set var="locationUrl" value="${pageContext.request.contextPath}"/>
         </sec:authorize>
         <sec:authorize access="isAnonymous()">
             <form:form class="form-inline my-2" id="login_form" action="spring_security_check" method="post">
@@ -25,6 +28,16 @@
                     <span class="fa fa-sign-in"></span>
                 </button>
             </form:form>
+            <c:set var="locationUrl" value="login"/>
         </sec:authorize>
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                ${fn:substring(pageContext.response.locale, 0, 2)}
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="${locationUrl}?langu=en">English</a>
+                <a class="dropdown-item" href="${locationUrl}?langu=ru">Русский</a>
+            </div>
+        </div>
     </div>
 </nav>
