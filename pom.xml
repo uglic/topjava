@@ -102,6 +102,9 @@
                                 <tofile>context.xml.default</tofile>
                             </configfile>
                         </configfiles>
+                        <properties>
+                            <cargo.port.offset>1</cargo.port.offset>
+                        </properties>
                     </configuration>
                     <deployables>
                         <deployable>

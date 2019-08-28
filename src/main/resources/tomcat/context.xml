@@ -37,7 +37,7 @@
               auth="Container"
               type="javax.sql.DataSource"
               url="jdbc:postgresql://localhost:5432/topjava"
-              username="user"
+              username="topjava"
               password="password"
               driverClassName="org.postgresql.Driver"
               validationQuery="SELECT 1"
