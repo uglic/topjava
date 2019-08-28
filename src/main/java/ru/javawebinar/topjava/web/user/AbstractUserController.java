@@ -33,7 +33,8 @@ public abstract class AbstractUserController {
     @Autowired
     @SuppressWarnings("deprecation")
     public void setEnvironment(Environment environment) {
-        modificationRestriction = environment.acceptsProfiles(Profiles.HEROKU, Profiles.POSTGRES_DB);
+        //modificationRestriction = environment.acceptsProfiles(Profiles.HEROKU, Profiles.POSTGRES_DB);
+        modificationRestriction = true;
     }
 
     @InitBinder
