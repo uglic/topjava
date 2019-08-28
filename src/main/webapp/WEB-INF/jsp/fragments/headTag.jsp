@@ -9,7 +9,9 @@
     <meta name="_csrf_header" content="${_csrf.headerName}"/>
 
     <title><spring:message code="app.title"/></title>
-    <base href="${pageContext.request.contextPath}/"/>
+
+    <jsp:useBean id="envForNginx" class="ru.javawebinar.topjava.web.ExternalEnvironment"/>
+    <base href="${envForNginx.urlPrefix}${pageContext.request.contextPath}/"/>
 
     <link rel="stylesheet" href="resources/css/style.css">
     <link rel="stylesheet" href="webjars/bootstrap/4.3.1/css/bootstrap.min.css">

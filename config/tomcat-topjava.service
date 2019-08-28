@@ -1,0 +1,16 @@
+[Unit]
+Description=Tomcat server with Topjava demo
+
+[Service]
+User=www-uglic-ru
+Group=www-uglic-ru
+Environment="JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64"
+Environment="TOPJAVA_ROOT=/data/www/uglic.ru/own_tests/topjava"
+Environment="TOPJAVA_URL_PREFIX=/demo"
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+WorkingDirectory=/data/www/uglic.ru/own_tests/topjava
+ExecStart=/usr/lib/jvm/java-11-openjdk-amd64/bin/java -classpath /usr/share/maven/boot/plexus-classworlds-2.x.jar -Dclassworlds.conf=/usr/share/maven/bin/m2.conf -Dmaven.home=/usr/share/maven -Dmaven.multiModuleProjectDirectory=/data/www/uglic.ru/own_tests/topjava org.codehaus.plexus.classworlds.launcher.Launcher -Dcargo.port.offset=1 cargo:run
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
